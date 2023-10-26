@@ -19,12 +19,15 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	flag.Parse()
 
+	os.Setenv("DBUSER", "admin")
+	os.Setenv("DBPASS", "admin")
+
 	cfg := mysql.Config{
 		User:                 os.Getenv("DBUSER"),
 		Passwd:               os.Getenv("DBPASS"),
 		Net:                  "tcp",
 		Addr:                 "127.0.0.1:3306",
-		DBName:               "psystem",
+		DBName:               "p_system",
 		AllowNativePasswords: true,
 	}
 
@@ -49,7 +52,6 @@ func main() {
 		Handler:  app.routes(),
 	}
 
-	infoLog.Printf("Listening on: http://localhost%s\n", *addr)
 	errorLog.Fatal(srv.ListenAndServe())
 }
 
