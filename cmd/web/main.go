@@ -8,11 +8,14 @@ import (
 	"os"
 
 	"github.com/go-sql-driver/mysql"
+	"p-system.okostadinov.net/internal/models"
 )
 
 type application struct {
-	infoLog  *log.Logger
-	errorLog *log.Logger
+	infoLog     *log.Logger
+	errorLog    *log.Logger
+	medications *models.MedicationModel
+	patients    *models.PatientModel
 }
 
 func main() {
@@ -42,8 +45,10 @@ func main() {
 	defer db.Close()
 
 	app := &application{
-		infoLog:  infoLog,
-		errorLog: errorLog,
+		infoLog:     infoLog,
+		errorLog:    errorLog,
+		medications: &models.MedicationModel{DB: db},
+		patients:    &models.PatientModel{DB: db},
 	}
 
 	srv := &http.Server{
