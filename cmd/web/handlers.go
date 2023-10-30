@@ -6,6 +6,12 @@ import (
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
+	latest, err := app.patients.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	files := []string{
 		"./ui/html/base.tmpl.html",
 		"./ui/html/partials/nav.tmpl.html",
@@ -18,11 +24,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", nil)
+	err = t.ExecuteTemplate(w, "base", latest)
 	if err != nil {
 		app.serverError(w, err)
 	}
-
 }
 
 func (app *application) create(w http.ResponseWriter, r *http.Request) {

@@ -2,9 +2,18 @@
 
 {{define "main"}}
     <h1>Последно добавени пациенти</h1>
-    <ul>
-        <li>patient 1</li>
-        <li>patient 2</li>
-        <li>patient 3</li>
-    </ul>
+    <table>
+        <tr>
+            <th>Име</th>
+            <th>Номер</th>
+            <th>Медикамент</th>
+        </tr>
+        {{range .}}
+        <tr>
+            <td><a href="/patients/{{.ID}}">{{.Name}}</a></td>
+            <td><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
+            <td>{{.Medication}}</td>
+        </tr>
+        {{end}}
+    </table>
 {{end}}

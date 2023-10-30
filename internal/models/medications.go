@@ -3,7 +3,6 @@ package models
 import "database/sql"
 
 type Medication struct {
-	ID   int
 	Name string
 }
 
@@ -11,41 +10,51 @@ type MedicationModel struct {
 	DB *sql.DB
 }
 
-func (m *MedicationModel) Insert(name string) (int, error) {
+func (m *MedicationModel) Insert(name string) error {
 	stmt := "INSERT INTO medications (name) VALUES (?)"
-	result, err := m.DB.Exec(stmt, name)
+	_, err := m.DB.Exec(stmt, name)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return int(id), nil
+	return nil
 }
 
-func (m *MedicationModel) Get(id int) (*Medication, error) {
-	var med Medication
-
-	stmt := "SELECT * FROM medications WHERE id = ?"
-	err := m.DB.QueryRow(stmt, id).Scan(&med.ID, &med.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	return &med, nil
-}
-
-func (m *MedicationModel) GetByName(name string) (*Medication, error) {
+func (m *MedicationModel) Get(name string) (*Medication, error) {
 	var med Medication
 
 	stmt := "SELECT * FROM medications WHERE name = ?"
-	err := m.DB.QueryRow(stmt, name).Scan(&med.ID, &med.Name)
+	err := m.DB.QueryRow(stmt, name).Scan(&med.Name)
 	if err != nil {
 		return nil, err
 	}
 
 	return &med, nil
+}
+
+func (m *MedicationModel) GetAll() ([]*Medication, error) {
+	var medications []*Medication
+
+	stmt := "SELECT * FROM medications"
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var med Medication
+
+		err = rows.Scan(&med.Name)
+		if err != nil {
+			return nil, err
+		}
+		medications = append(medications, &med)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return medications, nil
 }

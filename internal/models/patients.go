@@ -11,8 +11,8 @@ type Patient struct {
 	PhoneNumber       string
 	Height            int
 	Weight            int
+	Medication        string
 	Note              string
-	MedicationID      int
 	Approved          bool
 	FirstContinuation bool
 }
@@ -21,10 +21,10 @@ type PatientModel struct {
 	DB *sql.DB
 }
 
-func (m *PatientModel) Insert(ucn int, name string, number string, height int, weight int, medicationId int, note string) (int, error) {
-	stmt := "INSERT INTO patients (ucn, name, phone_number, height, weight, medication_id, note) VALUES (?, ?, ?, ?, ?, ?, ?)"
+func (m *PatientModel) Insert(ucn int, name string, number string, height int, weight int, medication string, note string) (int, error) {
+	stmt := "INSERT INTO patients (ucn, name, phone_number, height, weight, medication, note) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := m.DB.Exec(stmt, ucn, name, number, height, weight, medicationId, note)
+	result, err := m.DB.Exec(stmt, ucn, name, number, height, weight, medication, note)
 	if err != nil {
 		return 0, nil
 	}
@@ -41,7 +41,7 @@ func (m *PatientModel) Get(id int) (*Patient, error) {
 	var p Patient
 
 	stmt := "SELECT * FROM patients WHERE id = ?"
-	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.MedicationID, &p.Note, &p.Approved, &p.FirstContinuation)
+	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func (m *PatientModel) GetByUCN(ucn int) (*Patient, error) {
 	var p Patient
 
 	stmt := "SELECT * FROM patients WHERE ucn = ?"
-	err := m.DB.QueryRow(stmt, ucn).Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.MedicationID, &p.Note, &p.Approved, &p.FirstContinuation)
+	err := m.DB.QueryRow(stmt, ucn).Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (m *PatientModel) GetByUCN(ucn int) (*Patient, error) {
 func (m *PatientModel) Latest() ([]*Patient, error) {
 	var patients []*Patient
 
-	stmt := "SELECT * FROM patients ORDER BY ID DECS LIMIT 10"
+	stmt := "SELECT * FROM patients ORDER BY ID DESC LIMIT 10"
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
@@ -74,7 +74,7 @@ func (m *PatientModel) Latest() ([]*Patient, error) {
 	for rows.Next() {
 		var p Patient
 
-		err = rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.MedicationID, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 		if err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (m *PatientModel) GetAll() ([]*Patient, error) {
 	for rows.Next() {
 		var p Patient
 
-		err = rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.MedicationID, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +118,7 @@ func (m *PatientModel) GetAll() ([]*Patient, error) {
 func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error) {
 	var patients []*Patient
 
-	stmt := "SELECT patients.* FROM patients JOIN medications ON patients.medication_id = medications.id WHERE medications.name = ?"
+	stmt := "SELECT * FROM patients WHERE medication = ?"
 	rows, err := m.DB.Query(stmt, medication)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error)
 	for rows.Next() {
 		var p Patient
 
-		err = rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.MedicationID, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 		if err != nil {
 			return nil, err
 		}
