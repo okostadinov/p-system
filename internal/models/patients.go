@@ -115,11 +115,11 @@ func (m *PatientModel) GetAll() ([]*Patient, error) {
 	return patients, nil
 }
 
-func (m *PatientModel) GetAllByMedicationID(medicationId int) ([]*Patient, error) {
+func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error) {
 	var patients []*Patient
 
-	stmt := "SELECT * FROM patients WHERE medication_id = ?"
-	rows, err := m.DB.Query(stmt, medicationId)
+	stmt := "SELECT patients.* FROM patients JOIN medications ON patients.medication_id = medications.id WHERE medications.name = ?"
+	rows, err := m.DB.Query(stmt, medication)
 	if err != nil {
 		return nil, err
 	}
