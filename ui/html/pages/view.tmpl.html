@@ -1,5 +1,46 @@
 {{define "title"}}Patient #{{.ID}}{{end}}
 
 {{define "main"}}
-    
+   <h1>Пациент: {{.Name}}</h1>
+   <form action="/patients/{{.ID}}" method="POST">
+        <div>
+            <label for="ucn">ЕГН</label>
+            <input name="ucn" id="ucn" type="text" value="{{.UCN}}">
+        </div>
+        <div>
+            <label for="name">Имена</label>
+            <input name="name" id="name" type="text" value="{{.Name}}">
+        </div>
+        <div>
+            <label for="phone_number">Номер</label>
+            <input name="phone_number" id="phone_number" type="text" value="{{.PhoneNumber}}">
+        </div>
+        <div>
+            <label for="height">Ръст</label>
+            <input name="height" id="height" type="number" value="{{.Height}}">
+        </div>
+        <div>
+            <label for="weight">Тегло</label>
+            <input name="weight" id="weight" type="number" value="{{.Weight}}">
+        </div>
+        <div>
+            <label for="medication">Медикамент</label>
+            <input name="medication" id="medication" type="text" value="{{.Medication}}">
+        </div>
+        <div>
+            <label for="approved">Потвърден</label>
+            <input name="approved" id="approved" type="checkbox" value="{{.approved}}">
+        </div>
+        <div>
+            <label for="first_continuation">Първо продължение</label>
+            <input name="first_continuation" id="first_continuation" type="checkbox" value="{{.FirstContinuation}}">
+        </div>
+        <div>
+            <label for="note">Допълнително</label>
+            <textarea name="note" id="note">{{.Note}}</textarea>
+        </div>
+        <div>
+            <input type="submit" value="Запази">
+        </div>
+   </form> 
 {{end}}
