@@ -29,11 +29,11 @@
         </div>
         <div>
             <label for="approved">Потвърден</label>
-            <input name="approved" id="approved" type="checkbox" value="{{.approved}}">
+            <input name="approved" id="approved" type="checkbox" value="{{.Approved}}" {{if .Approved}}checked{{end}}>
         </div>
         <div>
             <label for="first_continuation">Първо продължение</label>
-            <input name="first_continuation" id="first_continuation" type="checkbox" value="{{.FirstContinuation}}">
+            <input name="first_continuation" id="first_continuation" type="checkbox" value="{{.FirstContinuation}}" {{if .FirstContinuation}}checked{{end}}>
         </div>
         <div>
             <label for="note">Допълнително</label>

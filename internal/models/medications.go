@@ -58,3 +58,10 @@ func (m *MedicationModel) GetAll() ([]*Medication, error) {
 
 	return medications, nil
 }
+
+func (m *MedicationModel) Delete(name string) error {
+	stmt := "DELETE FROM medications WHERE name = ?"
+
+	_, err := m.DB.Exec(stmt, name)
+	return err
+}

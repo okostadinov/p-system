@@ -1,0 +1,30 @@
+{{define "title"}}Medications{{end}}
+
+{{define "main"}}
+    <h1>Медикаменти</h1>
+    <form action="/medications/" method="POST">
+        <div>
+            <label for="name">Нов медикамент</label>
+            <input type="text" name="name" id="name">
+        </div>
+        <div>
+            <input type="submit" value="Добави">
+        </div>
+    </form>
+    <table>
+        <tr>
+            <th>Наименование</th>
+        </tr>        
+        {{range .}}
+            <tr>
+                <td><a href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
+                <td>
+                    <form action="/medications/delete" method="POST">
+                        <input type="hidden" name="name" value="{{.Name}}">
+                        <input type="submit" value="Изтрий">
+                    </form>
+                </td>
+            </tr>
+        {{end}}
+    </table>
+{{end}}

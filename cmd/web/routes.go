@@ -12,15 +12,16 @@ func (app *application) routes() *mux.Router {
 
 	patientsRouter := mux.PathPrefix("/patients").Subrouter()
 	patientsRouter.HandleFunc("/", app.patientList).Methods("GET")
+	patientsRouter.HandleFunc("/medication/{name}", app.patientListFiltered).Methods("GET")
 	patientsRouter.HandleFunc("/create", app.patientCreate).Methods("GET")
 	patientsRouter.HandleFunc("/create", app.patientCreatePost).Methods("POST")
-	patientsRouter.HandleFunc("/{id}", app.patientView).Methods("GET")
-	patientsRouter.HandleFunc("/{id}", app.patientUpdate).Methods("PUT")
-	patientsRouter.HandleFunc("/{id}", app.patientDelete).Methods("DELETE")
+	patientsRouter.HandleFunc("/delete", app.patientDelete).Methods("POST")
+	patientsRouter.HandleFunc("/{id:[0-9]+}", app.patientView).Methods("GET")
+	patientsRouter.HandleFunc("/{id:[0-9]+}", app.patientUpdate).Methods("POST")
 
 	medicationsRouter := mux.PathPrefix("/medications").Subrouter()
 	medicationsRouter.HandleFunc("/", app.medicationList).Methods("GET")
 	medicationsRouter.HandleFunc("/", app.medicationAdd).Methods("POST")
-	medicationsRouter.HandleFunc("/{id}", app.medicationDelete).Methods("DELETE")
+	medicationsRouter.HandleFunc("/delete", app.medicationDelete).Methods("POST")
 	return mux
 }
