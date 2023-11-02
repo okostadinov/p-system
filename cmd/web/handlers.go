@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -34,45 +33,17 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/home.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Patients: latest,
-	}
-
-	err = t.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{Patients: latest})
 }
 
 func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/create.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
+	medications, err := app.medications.GetAll()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", nil)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "create.tmpl.html", &templateData{Medications: medications})
 }
 
 func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -90,26 +61,7 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/list.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Patients: patients,
-	}
-
-	err = t.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "list.tmpl.html", &templateData{Patients: patients})
 }
 
 func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Request) {
@@ -121,26 +73,7 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/list.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Patients: patients,
-	}
-
-	err = t.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "list.tmpl.html", &templateData{Patients: patients})
 }
 
 func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
@@ -161,26 +94,7 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/view.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Patient: patient,
-	}
-
-	err = t.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{Patient: patient})
 }
 
 func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
@@ -210,26 +124,7 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	files := []string{
-		"./ui/html/base.tmpl.html",
-		"./ui/html/partials/nav.tmpl.html",
-		"./ui/html/pages/medications.tmpl.html",
-	}
-
-	t, err := template.ParseFiles(files...)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := &templateData{
-		Medications: medications,
-	}
-
-	err = t.ExecuteTemplate(w, "base", data)
-	if err != nil {
-		app.serverError(w, err)
-	}
+	app.render(w, http.StatusOK, "medications.tmpl.html", &templateData{Medications: medications})
 }
 
 func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
@@ -247,7 +142,17 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 
-	err := app.medications.Delete(name)
+	patients, err := app.patients.GetAllByMedication(name)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	if len(patients) > 0 {
+		http.Redirect(w, r, "/medications/", http.StatusForbidden)
+	}
+
+	err = app.medications.Delete(name)
 	if err != nil {
 		app.serverError(w, err)
 		return
