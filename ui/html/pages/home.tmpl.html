@@ -2,13 +2,14 @@
 
 {{define "main"}}
     <h1>Последно добавени пациенти</h1>
+    {{if .Patients}}
     <table>
         <tr>
             <th>Име</th>
             <th>Номер</th>
             <th>Медикамент</th>
         </tr>
-        {{range .}}
+        {{range .Patients}}
         <tr>
             <td><a href="/patients/{{.ID}}">{{.Name}}</a></td>
             <td><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
@@ -16,4 +17,5 @@
         </tr>
         {{end}}
     </table>
+    {{end}}
 {{end}}

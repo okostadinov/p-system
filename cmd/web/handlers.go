@@ -8,7 +8,14 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"p-system.okostadinov.net/internal/models"
 )
+
+type templateData struct {
+	Patient     *models.Patient
+	Patients    []*models.Patient
+	Medications []*models.Medication
+}
 
 type patientCreateForm struct {
 	UCN         int    `form:"ucn"`
@@ -39,7 +46,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", latest)
+	data := &templateData{
+		Patients: latest,
+	}
+
+	err = t.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -91,7 +102,11 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", patients)
+	data := &templateData{
+		Patients: patients,
+	}
+
+	err = t.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -118,7 +133,11 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", patients)
+	data := &templateData{
+		Patients: patients,
+	}
+
+	err = t.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -154,7 +173,11 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", patient)
+	data := &templateData{
+		Patient: patient,
+	}
+
+	err = t.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}
@@ -199,7 +222,11 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = t.ExecuteTemplate(w, "base", medications)
+	data := &templateData{
+		Medications: medications,
+	}
+
+	err = t.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		app.serverError(w, err)
 	}

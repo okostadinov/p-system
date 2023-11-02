@@ -1,8 +1,9 @@
-{{define "title"}}Patient #{{.ID}}{{end}}
+{{define "title"}}Patient #{{.Patient.ID}}{{end}}
 
 {{define "main"}}
-   <h1>Пациент: {{.Name}}</h1>
-   <form action="/patients/{{.ID}}" method="POST">
+    {{with .Patient}}
+    <h1>Пациент: {{.Name}}</h1>
+    <form action="/patients/{{.ID}}" method="POST">
         <div>
             <label for="ucn">ЕГН</label>
             <input name="ucn" id="ucn" type="text" value="{{.UCN}}">
@@ -42,5 +43,6 @@
         <div>
             <input type="submit" value="Запази">
         </div>
-   </form> 
+    </form> 
+    {{end}}
 {{end}}

@@ -2,6 +2,7 @@
 
 {{define "main"}}
     <h1>Всички Пациенти</h1>
+    {{if .Patients}}
     <table>
         <tr>
             <th>ЕГН</th>
@@ -13,7 +14,7 @@
             <th>Потвърден</th>
             <th>ПП</th>
         </tr>
-        {{range .}}
+        {{range .Patients}}
         <tr>
             <td>{{.UCN}}</td>
             <td><a href="/patients/{{.ID}}">{{.Name}}</a></td>
@@ -32,4 +33,5 @@
         </tr>
         {{end}}
     </table>
+    {{end}}
 {{end}}

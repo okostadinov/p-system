@@ -11,11 +11,12 @@
             <input type="submit" value="Добави">
         </div>
     </form>
+    {{if .Medications}}
     <table>
         <tr>
             <th>Наименование</th>
         </tr>        
-        {{range .}}
+        {{range .Medications}}
             <tr>
                 <td><a href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
                 <td>
@@ -27,4 +28,5 @@
             </tr>
         {{end}}
     </table>
+    {{end}}
 {{end}}
