@@ -11,6 +11,7 @@ import (
 )
 
 type templateData struct {
+	CurrentYear int
 	Patient     *models.Patient
 	Patients    []*models.Patient
 	Medications []*models.Medication
@@ -33,7 +34,9 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "home.tmpl.html", &templateData{Patients: latest})
+	data := app.newTemplateData(r)
+	data.Patients = latest
+	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
 
 func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +46,9 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "create.tmpl.html", &templateData{Medications: medications})
+	data := app.newTemplateData(r)
+	data.Medications = medications
+	app.render(w, http.StatusOK, "create.tmpl.html", data)
 }
 
 func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +66,9 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "list.tmpl.html", &templateData{Patients: patients})
+	data := app.newTemplateData(r)
+	data.Patients = patients
+	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
 func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +80,9 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	app.render(w, http.StatusOK, "list.tmpl.html", &templateData{Patients: patients})
+	data := app.newTemplateData(r)
+	data.Patients = patients
+	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
 func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
@@ -94,7 +103,9 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "view.tmpl.html", &templateData{Patient: patient})
+	data := app.newTemplateData(r)
+	data.Patient = patient
+	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
 func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +135,9 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.render(w, http.StatusOK, "medications.tmpl.html", &templateData{Medications: medications})
+	data := app.newTemplateData(r)
+	data.Medications = medications
+	app.render(w, http.StatusOK, "medications.tmpl.html", data)
 }
 
 func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
@@ -150,6 +163,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 
 	if len(patients) > 0 {
 		http.Redirect(w, r, "/medications/", http.StatusForbidden)
+		// TODO: add message to request context once sessions are added
 	}
 
 	err = app.medications.Delete(name)
