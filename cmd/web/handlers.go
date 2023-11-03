@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -54,9 +55,43 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	ucn, err := strconv.Atoi(r.PostForm.Get("ucn"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	name := r.PostForm.Get("name")
+
+	number := r.PostForm.Get("phone_number")
+
+	height, err := strconv.Atoi(r.PostForm.Get("height"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	weight, err := strconv.Atoi(r.PostForm.Get("weight"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	medication := r.PostForm.Get("medication")
+
+	note := r.PostForm.Get("note")
+
+	id, err := app.patients.Insert(ucn, name, number, height, weight, medication, note)
+	if err != nil {
 		app.serverError(w, err)
 		return
 	}
+
+	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
@@ -86,8 +121,7 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -109,7 +143,76 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("getting a patient"))
+	id, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	err = r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	ucn, err := strconv.Atoi(r.PostForm.Get("ucn"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	name := r.PostForm.Get("name")
+
+	number := r.PostForm.Get("phone_number")
+
+	height, err := strconv.Atoi(r.PostForm.Get("height"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	weight, err := strconv.Atoi(r.PostForm.Get("weight"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	medication := r.PostForm.Get("medication")
+
+	note := r.PostForm.Get("note")
+
+	approved, err := strconv.ParseBool(r.PostForm.Get("approved"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	firstCont, err := strconv.ParseBool(r.PostForm.Get("first_continuation"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	patient := &models.Patient{
+		ID:                id,
+		UCN:               ucn,
+		Name:              name,
+		PhoneNumber:       number,
+		Height:            height,
+		Weight:            weight,
+		Medication:        medication,
+		Note:              note,
+		Approved:          approved,
+		FirstContinuation: firstCont,
+	}
+
+	err = app.patients.Update(patient)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {

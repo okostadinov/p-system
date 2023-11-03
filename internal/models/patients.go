@@ -142,6 +142,13 @@ func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error)
 	return patients, nil
 }
 
+func (m *PatientModel) Update(p *Patient) error {
+	stmt := "UPDATE patients SET ucn = ?, name = ?, phone_number = ?, height = ?, weight = ?, medication = ?, note = ?, approved = ?, first_continuation = ? WHERE id = ?"
+
+	_, err := m.DB.Exec(stmt, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.ID)
+	return err
+}
+
 func (m *PatientModel) Delete(id int) error {
 	stmt := "DELETE FROM patients WHERE id = ?"
 

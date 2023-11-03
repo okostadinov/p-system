@@ -29,12 +29,35 @@
             <input name="medication" id="medication" type="text" value="{{.Medication}}">
         </div>
         <div>
-            <label for="approved">Потвърден</label>
-            <input name="approved" id="approved" type="checkbox" value="{{.Approved}}" {{if .Approved}}checked{{end}}>
+            <fieldset>
+                <legend>Потвърден</legend>
+                <div>
+                    <label>
+                        <input name="approved" type="radio" value="true" {{if .Approved}}checked{{end}}> Да
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input name="approved" type="radio" value="false" {{if not .Approved}}checked{{end}}> Не
+                    </label>
+                </div>
+            </fieldset>
         </div>
         <div>
-            <label for="first_continuation">Първо продължение</label>
-            <input name="first_continuation" id="first_continuation" type="checkbox" value="{{.FirstContinuation}}" {{if .FirstContinuation}}checked{{end}}>
+            <fieldset>
+                <legend>Първо продължение</legend>
+                <div>
+                    <label>
+                        <input name="first_continuation" type="radio" value="true" {{if .FirstContinuation}}checked{{end}}> Да
+                    </label>
+    
+                </div>
+                <div>
+                    <label>
+                        <input name="first_continuation" type="radio" value="false" {{if not .FirstContinuation}}checked{{end}}> Не
+                    </label>
+                </div>
+            </fieldset>
         </div>
         <div>
             <label for="note">Допълнително</label>
