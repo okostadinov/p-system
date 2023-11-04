@@ -59,11 +59,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ucn, err := strconv.Atoi(r.PostForm.Get("ucn"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
+	ucn := r.PostForm.Get("ucn")
 
 	name := r.PostForm.Get("name")
 
@@ -162,11 +158,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ucn, err := strconv.Atoi(r.PostForm.Get("ucn"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
+	ucn := r.PostForm.Get("ucn")
 
 	name := r.PostForm.Get("name")
 

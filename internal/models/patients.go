@@ -6,7 +6,7 @@ import (
 
 type Patient struct {
 	ID                int
-	UCN               int
+	UCN               string
 	Name              string
 	PhoneNumber       string
 	Height            int
@@ -21,7 +21,7 @@ type PatientModel struct {
 	DB *sql.DB
 }
 
-func (m *PatientModel) Insert(ucn int, name string, number string, height int, weight int, medication string, note string) (int, error) {
+func (m *PatientModel) Insert(ucn string, name string, number string, height int, weight int, medication string, note string) (int, error) {
 	stmt := "INSERT INTO patients (ucn, name, phone_number, height, weight, medication, note) VALUES (?, ?, ?, ?, ?, ?, ?)"
 
 	result, err := m.DB.Exec(stmt, ucn, name, number, height, weight, medication, note)
@@ -49,7 +49,7 @@ func (m *PatientModel) Get(id int) (*Patient, error) {
 	return &p, nil
 }
 
-func (m *PatientModel) GetByUCN(ucn int) (*Patient, error) {
+func (m *PatientModel) GetByUCN(ucn string) (*Patient, error) {
 	var p Patient
 
 	stmt := "SELECT * FROM patients WHERE ucn = ?"

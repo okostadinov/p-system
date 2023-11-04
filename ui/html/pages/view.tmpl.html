@@ -3,7 +3,7 @@
 {{define "main"}}
     {{if .Patient}}
     <h1>Пациент: {{.Patient.Name}}</h1>
-    <form action="/patients/{{.Patient.ID}}" method="POST">
+    <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
         <div>
             <label for="ucn">ЕГН</label>
             <input name="ucn" id="ucn" type="text" value="{{.Patient.UCN}}">
