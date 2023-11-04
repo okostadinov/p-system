@@ -137,8 +137,15 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	medications, err := app.medications.GetAll()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	data := app.newTemplateData(r)
 	data.Patient = patient
+	data.Medications = medications
 	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 

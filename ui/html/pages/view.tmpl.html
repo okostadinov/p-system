@@ -1,44 +1,49 @@
 {{define "title"}}Patient #{{.Patient.ID}}{{end}}
 
 {{define "main"}}
-    {{with .Patient}}
-    <h1>Пациент: {{.Name}}</h1>
-    <form action="/patients/{{.ID}}" method="POST">
+    {{if .Patient}}
+    <h1>Пациент: {{.Patient.Name}}</h1>
+    <form action="/patients/{{.Patient.ID}}" method="POST">
         <div>
             <label for="ucn">ЕГН</label>
-            <input name="ucn" id="ucn" type="text" value="{{.UCN}}">
+            <input name="ucn" id="ucn" type="text" value="{{.Patient.UCN}}">
         </div>
         <div>
             <label for="name">Имена</label>
-            <input name="name" id="name" type="text" value="{{.Name}}">
+            <input name="name" id="name" type="text" value="{{.Patient.Name}}">
         </div>
         <div>
             <label for="phone_number">Номер</label>
-            <input name="phone_number" id="phone_number" type="text" value="{{.PhoneNumber}}">
+            <input name="phone_number" id="phone_number" type="text" value="{{.Patient.PhoneNumber}}">
         </div>
         <div>
             <label for="height">Ръст</label>
-            <input name="height" id="height" type="number" value="{{.Height}}">
+            <input name="height" id="height" type="number" value="{{.Patient.Height}}">
         </div>
         <div>
             <label for="weight">Тегло</label>
-            <input name="weight" id="weight" type="number" value="{{.Weight}}">
+            <input name="weight" id="weight" type="number" value="{{.Patient.Weight}}">
         </div>
         <div>
             <label for="medication">Медикамент</label>
-            <input name="medication" id="medication" type="text" value="{{.Medication}}">
+            <select name="medication" id="medication">
+                {{$p := .Patient}}
+                {{range .Medications}}
+                    <option value="{{.Name}}"{{if eq $p.Medication .Name}}selected{{end}}>{{.Name}}</option>
+                {{end}}
+            </select>
         </div>
         <div>
             <fieldset>
                 <legend>Потвърден</legend>
                 <div>
                     <label>
-                        <input name="approved" type="radio" value="true" {{if .Approved}}checked{{end}}> Да
+                        <input name="approved" type="radio" value="true" {{if .Patient.Approved}}checked{{end}}> Да
                     </label>
                 </div>
                 <div>
                     <label>
-                        <input name="approved" type="radio" value="false" {{if not .Approved}}checked{{end}}> Не
+                        <input name="approved" type="radio" value="false" {{if not .Patient.Approved}}checked{{end}}> Не
                     </label>
                 </div>
             </fieldset>
@@ -48,20 +53,20 @@
                 <legend>Първо продължение</legend>
                 <div>
                     <label>
-                        <input name="first_continuation" type="radio" value="true" {{if .FirstContinuation}}checked{{end}}> Да
+                        <input name="first_continuation" type="radio" value="true" {{if .Patient.FirstContinuation}}checked{{end}}> Да
                     </label>
     
                 </div>
                 <div>
                     <label>
-                        <input name="first_continuation" type="radio" value="false" {{if not .FirstContinuation}}checked{{end}}> Не
+                        <input name="first_continuation" type="radio" value="false" {{if not .Patient.FirstContinuation}}checked{{end}}> Не
                     </label>
                 </div>
             </fieldset>
         </div>
         <div>
             <label for="note">Допълнително</label>
-            <textarea name="note" id="note">{{.Note}}</textarea>
+            <textarea name="note" id="note">{{.Patient.Note}}</textarea>
         </div>
         <div>
             <input type="submit" value="Запази">
