@@ -6,22 +6,37 @@
     <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
         <div>
             <label for="ucn">ЕГН</label>
+            {{with .Form.FieldErrors.ucn}}
+                <label for="ucn" class="error">{{.}}</label>
+            {{end}}    
             <input name="ucn" id="ucn" type="text" value="{{.Patient.UCN}}">
         </div>
         <div>
             <label for="name">Имена</label>
+            {{with .Form.FieldErrors.name}}
+                <label for="name" class="error">{{.}}</label>
+            {{end}}    
             <input name="name" id="name" type="text" value="{{.Patient.Name}}">
         </div>
         <div>
             <label for="phone_number">Номер</label>
+            {{with .Form.FieldErrors.phone_number}}
+                <label for="phone_number" class="error">{{.}}</label>
+            {{end}}
             <input name="phone_number" id="phone_number" type="text" value="{{.Patient.PhoneNumber}}">
         </div>
         <div>
             <label for="height">Ръст</label>
+            {{with .Form.FieldErrors.height}}
+                <label for="height" class="error">{{.}}</label>
+            {{end}}    
             <input name="height" id="height" type="number" value="{{.Patient.Height}}">
         </div>
         <div>
             <label for="weight">Тегло</label>
+            {{with .Form.FieldErrors.weight}}
+                <label for="weight" class="error">{{.}}</label>
+            {{end}}    
             <input name="weight" id="weight" type="number" value="{{.Patient.Weight}}">
         </div>
         <div>
@@ -34,8 +49,15 @@
             </select>
         </div>
         <div>
+            <label for="note">Коментар</label>
+            {{with .Form.FieldErrors.note}}
+                <label for="note" class="error">{{.}}</label>
+            {{end}}    
+            <textarea name="note" id="note">{{.Patient.Note}}</textarea>
+        </div>
+        <div>
             <fieldset>
-                <legend>Потвърден</legend>
+                <legend>Одобрен</legend>
                 <div>
                     <label>
                         <input name="approved" type="radio" value="true" {{if .Patient.Approved}}checked{{end}}> Да
@@ -55,7 +77,6 @@
                     <label>
                         <input name="first_continuation" type="radio" value="true" {{if .Patient.FirstContinuation}}checked{{end}}> Да
                     </label>
-    
                 </div>
                 <div>
                     <label>
@@ -63,10 +84,6 @@
                     </label>
                 </div>
             </fieldset>
-        </div>
-        <div>
-            <label for="note">Допълнително</label>
-            <textarea name="note" id="note">{{.Patient.Note}}</textarea>
         </div>
         <div>
             <input type="submit" value="Запази">

@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/schema"
 	"p-system.okostadinov.net/internal/models"
 )
 
@@ -18,6 +19,7 @@ type application struct {
 	medications   *models.MedicationModel
 	patients      *models.PatientModel
 	templateCache map[string]*template.Template
+	decoder       *schema.Decoder
 }
 
 func main() {
@@ -51,12 +53,15 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	decoder := schema.NewDecoder()
+
 	app := &application{
 		infoLog:       infoLog,
 		errorLog:      errorLog,
 		medications:   &models.MedicationModel{DB: db},
 		patients:      &models.PatientModel{DB: db},
 		templateCache: templateCache,
+		decoder:       decoder,
 	}
 
 	srv := &http.Server{

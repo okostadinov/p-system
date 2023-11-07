@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"p-system.okostadinov.net/internal/models"
@@ -16,16 +17,36 @@ type templateData struct {
 	Patient     *models.Patient
 	Patients    []*models.Patient
 	Medications []*models.Medication
+	Form        any
 }
 
 type patientCreateForm struct {
-	UCN         int    `form:"ucn"`
-	Name        string `form:"name"`
-	PhoneNumber string `form:"phone_number"`
-	Height      int    `form:"height"`
-	Weight      int    `form:"weight"`
-	Medication  string `form:"medication"`
-	Note        string `form:"note"`
+	UCN         string `schema:"ucn"`
+	Name        string `schema:"name"`
+	PhoneNumber string `schema:"phone_number"`
+	Height      int    `schema:"height"`
+	Weight      int    `schema:"weight"`
+	Medication  string `schema:"medication"`
+	Note        string `schema:"note"`
+	FieldErrors map[string]string
+}
+
+type patientEditForm struct {
+	UCN               string `schema:"ucn"`
+	Name              string `schema:"name"`
+	PhoneNumber       string `schema:"phone_number"`
+	Height            int    `schema:"height"`
+	Weight            int    `schema:"weight"`
+	Medication        string `schema:"medication"`
+	Note              string `schema:"note"`
+	Approved          bool   `schema:"approved"`
+	FirstContinuation bool   `schema:"first_continuation"`
+	FieldErrors       map[string]string
+}
+
+type medicationAddForm struct {
+	Name        string `schema:"name"`
+	FieldErrors map[string]string
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +70,7 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Medications = medications
+	data.Form = &patientCreateForm{}
 	app.render(w, http.StatusOK, "create.tmpl.html", data)
 }
 
@@ -59,29 +81,48 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	ucn := r.PostForm.Get("ucn")
+	var form patientCreateForm
 
-	name := r.PostForm.Get("name")
-
-	number := r.PostForm.Get("phone_number")
-
-	height, err := strconv.Atoi(r.PostForm.Get("height"))
+	err = app.decoder.Decode(&form, r.PostForm)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 
-	weight, err := strconv.Atoi(r.PostForm.Get("weight"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+	form.FieldErrors = map[string]string{}
+
+	if _, err = strconv.Atoi(form.UCN); err != nil {
+		form.FieldErrors["ucn"] = "невалиден ЕГН"
+	} else if len(form.UCN) != 10 {
+		form.FieldErrors["ucn"] = "невалиден формат ЕГН"
+	}
+	if strings.TrimSpace(form.Name) == "" {
+		form.FieldErrors["name"] = "задължително поле"
+	}
+	if strings.TrimSpace(form.PhoneNumber) == "" {
+		form.FieldErrors["phone_number"] = "задължително поле"
+	}
+	if strings.TrimSpace(form.Note) == "" {
+		form.FieldErrors["note"] = "задължително поле"
+	}
+	if form.Height < 1 {
+		form.FieldErrors["height"] = "невалиден ръст"
+	}
+	if form.Weight < 1 {
+		form.FieldErrors["weight"] = "невалидно тегло"
+	}
+
+	data := app.newTemplateData(r)
+	data.Form = form
+	// TODO: replace later with session context
+	data.Medications, _ = app.medications.GetAll()
+
+	if len(form.FieldErrors) > 0 {
+		app.render(w, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 		return
 	}
 
-	medication := r.PostForm.Get("medication")
-
-	note := r.PostForm.Get("note")
-
-	id, err := app.patients.Insert(ucn, name, number, height, weight, medication, note)
+	id, err := app.patients.Insert(form.UCN, form.Name, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Name)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -142,6 +183,7 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Patient = patient
 	data.Medications = medications
+	data.Form = &patientEditForm{}
 	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
@@ -158,54 +200,48 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ucn := r.PostForm.Get("ucn")
-
-	name := r.PostForm.Get("name")
-
-	number := r.PostForm.Get("phone_number")
-
-	height, err := strconv.Atoi(r.PostForm.Get("height"))
+	var form patientEditForm
+	err = app.decoder.Decode(&form, r.PostForm)
 	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+		app.serverError(w, err)
 		return
 	}
 
-	weight, err := strconv.Atoi(r.PostForm.Get("weight"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
+	form.FieldErrors = map[string]string{}
+
+	if _, err = strconv.Atoi(form.UCN); err != nil {
+		form.FieldErrors["ucn"] = "невалиден ЕГН"
+	} else if len(form.UCN) != 10 {
+		form.FieldErrors["ucn"] = "невалиден формат ЕГН"
+	}
+	if strings.TrimSpace(form.Name) == "" {
+		form.FieldErrors["name"] = "задължително поле"
+	}
+	if strings.TrimSpace(form.PhoneNumber) == "" {
+		form.FieldErrors["phone_number"] = "задължително поле"
+	}
+	if strings.TrimSpace(form.Note) == "" {
+		form.FieldErrors["note"] = "задължително поле"
+	}
+	if form.Height < 1 {
+		form.FieldErrors["height"] = "невалиден ръст"
+	}
+	if form.Weight < 1 {
+		form.FieldErrors["weight"] = "невалидно тегло"
+	}
+
+	data := app.newTemplateData(r)
+	data.Form = form
+	// TODO: replace later with session context
+	data.Patient, _ = app.patients.Get(id)
+	data.Medications, _ = app.medications.GetAll()
+
+	if len(form.FieldErrors) > 0 {
+		app.render(w, http.StatusUnprocessableEntity, "view.tmpl.html", data)
 		return
 	}
 
-	medication := r.PostForm.Get("medication")
-
-	note := r.PostForm.Get("note")
-
-	approved, err := strconv.ParseBool(r.PostForm.Get("approved"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	firstCont, err := strconv.ParseBool(r.PostForm.Get("first_continuation"))
-	if err != nil {
-		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	patient := &models.Patient{
-		ID:                id,
-		UCN:               ucn,
-		Name:              name,
-		PhoneNumber:       number,
-		Height:            height,
-		Weight:            weight,
-		Medication:        medication,
-		Note:              note,
-		Approved:          approved,
-		FirstContinuation: firstCont,
-	}
-
-	err = app.patients.Update(patient)
+	err = app.patients.Update(id, form.UCN, form.Name, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, form.Approved, form.FirstContinuation)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -239,15 +275,40 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Medications = medications
+	data.Form = &medicationAddForm{}
 	app.render(w, http.StatusOK, "medications.tmpl.html", data)
 }
 
 func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
-	name := r.FormValue("name")
-
-	err := app.medications.Insert(name)
+	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	var form medicationAddForm
+	err = app.decoder.Decode(&form, r.PostForm)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	form.FieldErrors = map[string]string{}
+	if strings.TrimSpace(form.Name) == "" {
+		form.FieldErrors["name"] = "задължително поле"
+	}
+
+	data := app.newTemplateData(r)
+	data.Form = form
+	data.Medications, _ = app.medications.GetAll()
+	if len(form.FieldErrors) > 0 {
+		app.render(w, http.StatusUnprocessableEntity, "medications.tmpl.html", data)
+		return
+	}
+
+	err = app.medications.Insert(form.Name)
+	if err != nil {
+		app.serverError(w, err)
 		return
 	}
 

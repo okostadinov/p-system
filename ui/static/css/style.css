@@ -15,3 +15,15 @@ body {
 header,  main, footer {
     padding: 0.5rem calc((100% - 800px) / 2);
 }
+
+div > label {
+    display: block;
+}
+
+.error {
+    color: red;
+}
+
+.error + input, .error + textarea {
+    border: 2px solid red;
+}

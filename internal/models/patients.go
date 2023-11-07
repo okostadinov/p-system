@@ -142,10 +142,10 @@ func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error)
 	return patients, nil
 }
 
-func (m *PatientModel) Update(p *Patient) error {
+func (m *PatientModel) Update(id int, ucn string, name string, phone string, height int, weight int, medication string, note string, approved bool, firstCont bool) error {
 	stmt := "UPDATE patients SET ucn = ?, name = ?, phone_number = ?, height = ?, weight = ?, medication = ?, note = ?, approved = ?, first_continuation = ? WHERE id = ?"
 
-	_, err := m.DB.Exec(stmt, &p.UCN, &p.Name, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.ID)
+	_, err := m.DB.Exec(stmt, ucn, name, phone, height, weight, medication, note, approved, firstCont, id)
 	return err
 }
 
