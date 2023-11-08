@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"strings"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"p-system.okostadinov.net/internal/models"
 )
@@ -21,31 +21,31 @@ type templateData struct {
 }
 
 type patientCreateForm struct {
-	UCN         string `schema:"ucn"`
-	Name        string `schema:"name"`
-	PhoneNumber string `schema:"phone_number"`
-	Height      int    `schema:"height"`
-	Weight      int    `schema:"weight"`
-	Medication  string `schema:"medication"`
-	Note        string `schema:"note"`
+	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
+	Name        string `schema:"name" validate:"required,alpha"`
+	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
+	Height      int    `schema:"height" validate:"required,numeric"`
+	Weight      int    `schema:"weight" validate:"required,numeric"`
+	Medication  string `schema:"medication" validate:"required"`
+	Note        string `schema:"note" validate:"required"`
 	FieldErrors map[string]string
 }
 
 type patientEditForm struct {
-	UCN               string `schema:"ucn"`
-	Name              string `schema:"name"`
-	PhoneNumber       string `schema:"phone_number"`
-	Height            int    `schema:"height"`
-	Weight            int    `schema:"weight"`
-	Medication        string `schema:"medication"`
-	Note              string `schema:"note"`
-	Approved          bool   `schema:"approved"`
-	FirstContinuation bool   `schema:"first_continuation"`
+	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
+	Name              string `schema:"name" validate:"required,alpha"`
+	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
+	Height            int    `schema:"height" validate:"required,numeric"`
+	Weight            int    `schema:"weight" validate:"required,numeric"`
+	Medication        string `schema:"medication" validate:"required"`
+	Note              string `schema:"note" validate:"required"`
+	Approved          bool   `schema:"approved" validate:"required"`
+	FirstContinuation bool   `schema:"first_continuation" validate:"required"`
 	FieldErrors       map[string]string
 }
 
 type medicationAddForm struct {
-	Name        string `schema:"name"`
+	Name        string `schema:"name" validate:"required,alpha"`
 	FieldErrors map[string]string
 }
 
@@ -90,26 +90,11 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 	}
 
 	form.FieldErrors = map[string]string{}
-
-	if _, err = strconv.Atoi(form.UCN); err != nil {
-		form.FieldErrors["ucn"] = "невалиден ЕГН"
-	} else if len(form.UCN) != 10 {
-		form.FieldErrors["ucn"] = "невалиден формат ЕГН"
-	}
-	if strings.TrimSpace(form.Name) == "" {
-		form.FieldErrors["name"] = "задължително поле"
-	}
-	if strings.TrimSpace(form.PhoneNumber) == "" {
-		form.FieldErrors["phone_number"] = "задължително поле"
-	}
-	if strings.TrimSpace(form.Note) == "" {
-		form.FieldErrors["note"] = "задължително поле"
-	}
-	if form.Height < 1 {
-		form.FieldErrors["height"] = "невалиден ръст"
-	}
-	if form.Weight < 1 {
-		form.FieldErrors["weight"] = "невалидно тегло"
+	err = app.validator.Struct(form)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
+		}
 	}
 
 	data := app.newTemplateData(r)
@@ -208,26 +193,11 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form.FieldErrors = map[string]string{}
-
-	if _, err = strconv.Atoi(form.UCN); err != nil {
-		form.FieldErrors["ucn"] = "невалиден ЕГН"
-	} else if len(form.UCN) != 10 {
-		form.FieldErrors["ucn"] = "невалиден формат ЕГН"
-	}
-	if strings.TrimSpace(form.Name) == "" {
-		form.FieldErrors["name"] = "задължително поле"
-	}
-	if strings.TrimSpace(form.PhoneNumber) == "" {
-		form.FieldErrors["phone_number"] = "задължително поле"
-	}
-	if strings.TrimSpace(form.Note) == "" {
-		form.FieldErrors["note"] = "задължително поле"
-	}
-	if form.Height < 1 {
-		form.FieldErrors["height"] = "невалиден ръст"
-	}
-	if form.Weight < 1 {
-		form.FieldErrors["weight"] = "невалидно тегло"
+	err = app.validator.Struct(form)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
+		}
 	}
 
 	data := app.newTemplateData(r)
@@ -294,8 +264,11 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	form.FieldErrors = map[string]string{}
-	if strings.TrimSpace(form.Name) == "" {
-		form.FieldErrors["name"] = "задължително поле"
+	err = app.validator.Struct(form)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
+		}
 	}
 
 	data := app.newTemplateData(r)

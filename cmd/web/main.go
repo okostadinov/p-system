@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gorilla/schema"
 	"p-system.okostadinov.net/internal/models"
@@ -20,7 +22,10 @@ type application struct {
 	patients      *models.PatientModel
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
+	validator     *validator.Validate
 }
+
+var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
@@ -54,6 +59,10 @@ func main() {
 	}
 
 	decoder := schema.NewDecoder()
+	validate = validator.New(validator.WithRequiredStructEnabled())
+	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
+		return field.Tag.Get("schema")
+	})
 
 	app := &application{
 		infoLog:       infoLog,
@@ -62,6 +71,7 @@ func main() {
 		patients:      &models.PatientModel{DB: db},
 		templateCache: templateCache,
 		decoder:       decoder,
+		validator:     validate,
 	}
 
 	srv := &http.Server{
