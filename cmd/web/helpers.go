@@ -54,3 +54,20 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 		CurrentYear: time.Now().Year(),
 	}
 }
+
+func (app *application) fetchTagErrorMessage(tag, param string) string {
+	switch tag {
+	case "required":
+		return "задължително поле"
+	case "numeric":
+		return "грешен формат (допустими стойности - цифри)"
+	case "len":
+		return fmt.Sprintf("невалидно количество символи (нужни - %v)", param)
+	case "alphaunicode":
+		return "грешен формат (допустими стойности - букви)"
+	case "e164":
+		return "грешен формат номер (пр. +359123456789)"
+	default:
+		return ""
+	}
+}
