@@ -63,7 +63,7 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 		return "грешен формат (допустими стойности - цифри)"
 	case "len":
 		return fmt.Sprintf("невалидно количество символи (нужни - %v)", param)
-	case "alpha":
+	case "alphaunicode":
 		return "грешен формат (допустими стойности - букви)"
 	case "e164":
 		return "грешен формат номер (пр. +359123456789)"

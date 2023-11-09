@@ -3,35 +3,37 @@
 {{define "main"}}
     <h1>Всички Пациенти</h1>
     {{if .Patients}}
-    <table>
-        <tr>
-            <th>ЕГН</th>
-            <th>Име</th>
-            <th>Номер</th>
-            <th>Ръст</th>
-            <th>Тегло</th>
-            <th>Медикамент</th>
-            <th>Одобрен</th>
-            <th>ПП</th>
-        </tr>
-        {{range .Patients}}
-        <tr>
-            <td>{{.UCN}}</td>
-            <td><a href="/patients/{{.ID}}">{{.Name}}</a></td>
-            <td><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
-            <td>{{.Height}}</td>
-            <td>{{.Weight}}</td>
-            <td>{{.Medication}}</td>
-            <td><input type="checkbox" disabled {{if .Approved}}checked{{end}}></td>
-            <td><input type="checkbox" disabled {{if .FirstContinuation}}checked{{end}}></td>
-            <td>
-                <form action="/patients/delete" method="POST">
-                    <input type="hidden" name="id" value="{{.ID}}">
-                    <input type="submit" value="Изтрий">
-                </form>
-            </td>
-        </tr>
-        {{end}}
-    </table>
+        <table>
+            <tr>
+                <th>ЕГН</th>
+                <th>Имена</th>
+                <th>Номер</th>
+                <th>Ръст</th>
+                <th>Тегло</th>
+                <th>Медикамент</th>
+                <th>Одобрен</th>
+                <th>ПП</th>
+            </tr>
+            {{range .Patients}}
+            <tr>
+                <td>{{.UCN}}</td>
+                <td><a href="/patients/{{.ID}}">{{.FirstName}} {{.LastName}}</a></td>
+                <td><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
+                <td>{{.Height}}</td>
+                <td>{{.Weight}}</td>
+                <td>{{.Medication}}</td>
+                <td><input type="checkbox" disabled {{if .Approved}}checked{{end}}></td>
+                <td><input type="checkbox" disabled {{if .FirstContinuation}}checked{{end}}></td>
+                <td>
+                    <form action="/patients/delete" method="POST">
+                        <input type="hidden" name="id" value="{{.ID}}">
+                        <input type="submit" value="Изтрий">
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </table>
+    {{else}}
+        <p>В момента няма пациенти, добави нов от <a href="/patients/create">тук</a></p>
     {{end}}
 {{end}}

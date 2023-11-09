@@ -22,7 +22,8 @@ type templateData struct {
 
 type patientCreateForm struct {
 	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
-	Name        string `schema:"name" validate:"required,alpha"`
+	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName    string `schema:"last_name" validate:"required,alphaunicode"`
 	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
 	Height      int    `schema:"height" validate:"required,numeric"`
 	Weight      int    `schema:"weight" validate:"required,numeric"`
@@ -33,7 +34,8 @@ type patientCreateForm struct {
 
 type patientEditForm struct {
 	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
-	Name              string `schema:"name" validate:"required,alpha"`
+	FirstName         string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName          string `schema:"last_name" validate:"required,alphaunicode"`
 	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
 	Height            int    `schema:"height" validate:"required,numeric"`
 	Weight            int    `schema:"weight" validate:"required,numeric"`
@@ -107,7 +109,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	id, err := app.patients.Insert(form.UCN, form.Name, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Name)
+	id, err := app.patients.Insert(form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -211,7 +213,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.patients.Update(id, form.UCN, form.Name, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, form.Approved, form.FirstContinuation)
+	err = app.patients.Update(id, form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, form.Approved, form.FirstContinuation)
 	if err != nil {
 		app.serverError(w, err)
 		return

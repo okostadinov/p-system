@@ -2,7 +2,7 @@
 
 {{define "main"}}
     {{if .Patient}}
-    <h1>Пациент: {{.Patient.Name}}</h1>
+    <h1>Пациент: {{.Patient.FirstName}} {{.Patient.LastName}}</h1>
     <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
         <div>
             <label for="ucn">ЕГН</label>
@@ -12,11 +12,18 @@
             <input name="ucn" id="ucn" type="text" value="{{.Patient.UCN}}">
         </div>
         <div>
-            <label for="name">Имена</label>
-            {{with .Form.FieldErrors.name}}
-                <label for="name" class="error">{{.}}</label>
+            <label for="first_name">Име</label>
+            {{with .Form.FieldErrors.first_name}}
+                <label for="first_name" class="error">{{.}}</label>
             {{end}}    
-            <input name="name" id="name" type="text" value="{{.Patient.Name}}">
+            <input name="first_name" id="first_name" type="text" value="{{.Patient.FirstName}}">
+        </div>
+        <div>
+            <label for="last_name">Фамилия</label>
+            {{with .Form.FieldErrors.last_name}}
+                <label for="last_name" class="error">{{.}}</label>
+            {{end}}    
+            <input name="last_name" id="last_name" type="text" value="{{.Patient.LastName}}">
         </div>
         <div>
             <label for="phone_number">Номер</label>

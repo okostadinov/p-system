@@ -12,11 +12,18 @@
                 <input name="ucn" id="ucn" type="text" value="{{.Form.UCN}}">
             </div>
             <div>
-                <label for="name">Имена</label>
-                {{with .Form.FieldErrors.name}}
-                    <label for="name" class="error">{{.}}</label>
+                <label for="first_name">Име</label>
+                {{with .Form.FieldErrors.first_name}}
+                    <label for="first_name" class="error">{{.}}</label>
                 {{end}}
-                <input name="name" id="name" type="text" value="{{.Form.Name}}">
+                <input name="first_name" id="first_name" type="text" value="{{.Form.FirstName}}">
+            </div>
+            <div>
+                <label for="last_name">Фамилия</label>
+                {{with .Form.FieldErrors.last_name}}
+                    <label for="last_name" class="error">{{.}}</label>
+                {{end}}
+                <input name="last_name" id="last_name" type="text" value="{{.Form.LastName}}">
             </div>
             <div>
                 <label for="phone_number">Номер</label>
@@ -60,6 +67,6 @@
             </div>
         </form>
     {{else}}
-        <p>Няма добавени медикаменти</p>
+        <p>За да създадеш нов пациент първо е нужно да добавиш медикамент от <a href="/medications/">тук</a></p>
     {{end}}
 {{end}}
