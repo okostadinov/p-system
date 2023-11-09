@@ -23,6 +23,7 @@ func (app *application) routes() *mux.Router {
 	patientsRouter.HandleFunc("/delete", app.patientDelete).Methods("POST")
 	patientsRouter.HandleFunc("/{id:[0-9]+}", app.patientView).Methods("GET")
 	patientsRouter.HandleFunc("/{id:[0-9]+}", app.patientUpdate).Methods("POST")
+	patientsRouter.HandleFunc("/search", app.patientSearchByUCN).Methods("POST")
 
 	medicationsRouter := mux.PathPrefix("/medications").Subrouter()
 	medicationsRouter.HandleFunc("/", app.medicationList).Methods("GET")
