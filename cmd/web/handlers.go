@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"p-system.okostadinov.net/internal/models"
 )
@@ -21,34 +20,34 @@ type templateData struct {
 }
 
 type patientCreateForm struct {
-	UCN         string            `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName   string            `schema:"first_name" validate:"required,alphaunicode"`
-	LastName    string            `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber string            `schema:"phone_number" validate:"required,e164"`
-	Height      int               `schema:"height" validate:"required,numeric"`
-	Weight      int               `schema:"weight" validate:"required,numeric"`
-	Medication  string            `schema:"medication" validate:"required"`
-	Note        string            `schema:"note" validate:"required"`
-	FieldErrors map[string]string `schema:"-"`
+	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName    string `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
+	Height      int    `schema:"height" validate:"required,numeric"`
+	Weight      int    `schema:"weight" validate:"required,numeric"`
+	Medication  string `schema:"medication" validate:"required"`
+	Note        string `schema:"note" validate:"required"`
+	FieldErrors `schema:"-"`
 }
 
 type patientEditForm struct {
-	UCN               string            `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName         string            `schema:"first_name" validate:"required,alphaunicode"`
-	LastName          string            `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber       string            `schema:"phone_number" validate:"required,e164"`
-	Height            int               `schema:"height" validate:"required,numeric"`
-	Weight            int               `schema:"weight" validate:"required,numeric"`
-	Medication        string            `schema:"medication" validate:"required"`
-	Note              string            `schema:"note" validate:"required"`
-	Approved          bool              `schema:"approved" validate:"required"`
-	FirstContinuation bool              `schema:"first_continuation" validate:"required"`
-	FieldErrors       map[string]string `schema:"-"`
+	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName         string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName          string `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
+	Height            int    `schema:"height" validate:"required,numeric"`
+	Weight            int    `schema:"weight" validate:"required,numeric"`
+	Medication        string `schema:"medication" validate:"required"`
+	Note              string `schema:"note" validate:"required"`
+	Approved          bool   `schema:"approved" validate:"boolean"`
+	FirstContinuation bool   `schema:"first_continuation" validate:"boolean"`
+	FieldErrors       `schema:"-"`
 }
 
 type medicationAddForm struct {
-	Name        string            `schema:"name" validate:"required,alpha"`
-	FieldErrors map[string]string `schema:"-"`
+	Name        string `schema:"name" validate:"required"`
+	FieldErrors `schema:"-"`
 }
 
 type searchByUCNForm struct {
@@ -82,26 +81,18 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request) {
 	var form patientCreateForm
-	err := app.decodePostForm(r, &form)
+	err := app.decodeForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	form.FieldErrors = map[string]string{}
-	err = app.validator.Struct(form)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
-		}
-	}
-
-	data := app.newTemplateData(r)
-	data.Form = form
-	// TODO: replace later with session context
-	data.Medications, _ = app.medications.GetAll()
-
-	if len(form.FieldErrors) > 0 {
+	if ok, errors := app.validateForm(form); !ok {
+		data := app.newTemplateData(r)
+		form.FieldErrors = errors
+		data.Form = form
+		// TODO: replace later with session context
+		data.Medications, _ = app.medications.GetAll()
 		app.render(w, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 		return
 	}
@@ -179,27 +170,19 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var form patientEditForm
-	err = app.decodePostForm(r, &form)
+	err = app.decodeForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	form.FieldErrors = map[string]string{}
-	err = app.validator.Struct(form)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
-		}
-	}
-
-	data := app.newTemplateData(r)
-	data.Form = form
-	// TODO: replace later with session context
-	data.Patient, _ = app.patients.Get(id)
-	data.Medications, _ = app.medications.GetAll()
-
-	if len(form.FieldErrors) > 0 {
+	if ok, errors := app.validateForm(form); !ok {
+		data := app.newTemplateData(r)
+		form.FieldErrors = errors
+		data.Form = form
+		// TODO: replace later with session context
+		data.Patient, _ = app.patients.Get(id)
+		data.Medications, _ = app.medications.GetAll()
 		app.render(w, http.StatusUnprocessableEntity, "view.tmpl.html", data)
 		return
 	}
@@ -231,7 +214,7 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Request) {
 	var form searchByUCNForm
-	err := app.decodePostForm(r, &form)
+	err := app.decodeForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -265,24 +248,17 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 	var form medicationAddForm
-	err := app.decodePostForm(r, &form)
+	err := app.decodeForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	form.FieldErrors = map[string]string{}
-	err = app.validator.Struct(form)
-	if err != nil {
-		for _, err := range err.(validator.ValidationErrors) {
-			form.FieldErrors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
-		}
-	}
-
-	data := app.newTemplateData(r)
-	data.Form = form
-	data.Medications, _ = app.medications.GetAll()
-	if len(form.FieldErrors) > 0 {
+	if ok, errors := app.validateForm(form); !ok {
+		data := app.newTemplateData(r)
+		form.FieldErrors = errors
+		data.Form = form
+		data.Medications, _ = app.medications.GetAll()
 		app.render(w, http.StatusUnprocessableEntity, "medications.tmpl.html", data)
 		return
 	}
