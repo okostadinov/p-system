@@ -21,34 +21,38 @@ type templateData struct {
 }
 
 type patientCreateForm struct {
-	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName    string `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
-	Height      int    `schema:"height" validate:"required,numeric"`
-	Weight      int    `schema:"weight" validate:"required,numeric"`
-	Medication  string `schema:"medication" validate:"required"`
-	Note        string `schema:"note" validate:"required"`
-	FieldErrors map[string]string
+	UCN         string            `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName   string            `schema:"first_name" validate:"required,alphaunicode"`
+	LastName    string            `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber string            `schema:"phone_number" validate:"required,e164"`
+	Height      int               `schema:"height" validate:"required,numeric"`
+	Weight      int               `schema:"weight" validate:"required,numeric"`
+	Medication  string            `schema:"medication" validate:"required"`
+	Note        string            `schema:"note" validate:"required"`
+	FieldErrors map[string]string `schema:"-"`
 }
 
 type patientEditForm struct {
-	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName         string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName          string `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
-	Height            int    `schema:"height" validate:"required,numeric"`
-	Weight            int    `schema:"weight" validate:"required,numeric"`
-	Medication        string `schema:"medication" validate:"required"`
-	Note              string `schema:"note" validate:"required"`
-	Approved          bool   `schema:"approved" validate:"required"`
-	FirstContinuation bool   `schema:"first_continuation" validate:"required"`
-	FieldErrors       map[string]string
+	UCN               string            `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName         string            `schema:"first_name" validate:"required,alphaunicode"`
+	LastName          string            `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber       string            `schema:"phone_number" validate:"required,e164"`
+	Height            int               `schema:"height" validate:"required,numeric"`
+	Weight            int               `schema:"weight" validate:"required,numeric"`
+	Medication        string            `schema:"medication" validate:"required"`
+	Note              string            `schema:"note" validate:"required"`
+	Approved          bool              `schema:"approved" validate:"required"`
+	FirstContinuation bool              `schema:"first_continuation" validate:"required"`
+	FieldErrors       map[string]string `schema:"-"`
 }
 
 type medicationAddForm struct {
-	Name        string `schema:"name" validate:"required,alpha"`
-	FieldErrors map[string]string
+	Name        string            `schema:"name" validate:"required,alpha"`
+	FieldErrors map[string]string `schema:"-"`
+}
+
+type searchByUCNForm struct {
+	UCN string `schema:"q"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -77,17 +81,10 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form patientCreateForm
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	var form patientCreateForm
-
-	err = app.decoder.Decode(&form, r.PostForm)
-	if err != nil {
-		app.serverError(w, err)
 		return
 	}
 
@@ -181,16 +178,10 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = r.ParseForm()
+	var form patientEditForm
+	err = app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	var form patientEditForm
-	err = app.decoder.Decode(&form, r.PostForm)
-	if err != nil {
-		app.serverError(w, err)
 		return
 	}
 
@@ -239,14 +230,14 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form searchByUCNForm
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
 	}
 
-	ucn := r.PostForm.Get("q")
-	patient, err := app.patients.GetByUCN(ucn)
+	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			app.notFound(w)
@@ -273,16 +264,10 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+	var form medicationAddForm
+	err := app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
-		return
-	}
-
-	var form medicationAddForm
-	err = app.decoder.Decode(&form, r.PostForm)
-	if err != nil {
-		app.serverError(w, err)
 		return
 	}
 

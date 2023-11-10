@@ -55,6 +55,22 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 	}
 }
 
+// decodes the request into a form struct
+func (app *application) decodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	err = app.decoder.Decode(dst, r.PostForm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// gets a translated form field error message based on the error
 func (app *application) fetchTagErrorMessage(tag, param string) string {
 	switch tag {
 	case "required":
