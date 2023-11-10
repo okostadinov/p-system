@@ -6,7 +6,11 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
+
+type FieldErrors map[string]string
 
 // outputs the error to the client, as well as logging it locally for debugging
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -55,6 +59,39 @@ func (app *application) newTemplateData(r *http.Request) *templateData {
 	}
 }
 
+// decodes the request into a form struct
+func (app *application) decodeForm(r *http.Request, form interface{}) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	err = app.decoder.Decode(form, r.PostForm)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// parses the form and returns whether the validation was successful or not, together with the a map of errors
+func (app *application) validateForm(form interface{}) (bool, FieldErrors) {
+	err := app.validator.Struct(form)
+
+	if err != nil {
+		errors := make(FieldErrors)
+
+		for _, err := range err.(validator.ValidationErrors) {
+			errors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
+		}
+
+		return false, errors
+	}
+
+	return true, nil
+}
+
+// gets a translated form field error message based on the error
 func (app *application) fetchTagErrorMessage(tag, param string) string {
 	switch tag {
 	case "required":
