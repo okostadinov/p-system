@@ -16,6 +16,16 @@ header,  main, footer {
     padding: 0.5rem calc((100% - 800px) / 2);
 }
 
+nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+nav > form {
+    margin-left: auto;
+}
+
 div > label {
     display: block;
 }

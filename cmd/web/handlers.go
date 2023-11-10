@@ -238,6 +238,27 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/patients/", http.StatusSeeOther)
 }
 
+func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	ucn := r.PostForm.Get("q")
+	patient, err := app.patients.GetByUCN(ucn)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			app.notFound(w)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/patients/%d", patient.ID), http.StatusSeeOther)
+}
+
 func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 	medications, err := app.medications.GetAll()
 	if err != nil {

@@ -4,5 +4,9 @@
     <a href="/patients/create">Създай нов пациент</a>
     <a href="/patients/">Всички пациенти</a>
     <a href="/medications/">Медикаменти</a>
+    <form action="/patients/search" method="POST" novalidate>
+        <input type="search" name="q" id="ucn" placeholder="ЕГН">
+        <input type="submit" value="Търси">
+    </form>
 </nav>
 {{end}}
