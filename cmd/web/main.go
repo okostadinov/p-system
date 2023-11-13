@@ -10,6 +10,7 @@ import (
 	"reflect"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/srinathgs/mysqlstore"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
@@ -24,13 +25,14 @@ type application struct {
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
 	validator     *validator.Validate
+	store         *mysqlstore.MySQLStore
 }
 
 var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true", "MySQL data source name")
+	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -48,11 +50,12 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	decoder := schema.NewDecoder()
-	validate = validator.New(validator.WithRequiredStructEnabled())
-	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
-		return field.Tag.Get("schema")
-	})
+	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte("secretkey"))
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer store.Close()
 
 	app := &application{
 		infoLog:       infoLog,
@@ -60,8 +63,9 @@ func main() {
 		medications:   &models.MedicationModel{DB: db},
 		patients:      &models.PatientModel{DB: db},
 		templateCache: templateCache,
-		decoder:       decoder,
-		validator:     validate,
+		decoder:       schema.NewDecoder(),
+		validator:     setupValidator(),
+		store:         store,
 	}
 
 	srv := &http.Server{
@@ -82,4 +86,13 @@ func openDB(dsn string) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func setupValidator() *validator.Validate {
+	validate = validator.New(validator.WithRequiredStructEnabled())
+	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
+		return field.Tag.Get("schema")
+	})
+
+	return validate
 }

@@ -12,6 +12,9 @@
         {{template "nav" .}}
     </header>
     <main>
+        {{with .Flash}}
+            <p class="flash">{{.}}</p>
+        {{end}}
         {{template "main" .}}
     </main>
     <footer>

@@ -108,3 +108,39 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 		return ""
 	}
 }
+
+// adds a flash message to the current session
+func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg string) error {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return err
+	}
+
+	session.AddFlash(msg, "message")
+	err = session.Save(r, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// pops the flash message from the current session and returns it
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) (string, error) {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return "", err
+	}
+
+	var flashMsg string
+	if flashes := session.Flashes("message"); len(flashes) > 0 {
+		flashMsg = flashes[0].(string)
+	}
+
+	err = session.Save(r, w)
+	if err != nil {
+		return "", err
+	}
+
+	return flashMsg, nil
+}

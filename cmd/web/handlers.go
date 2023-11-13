@@ -17,6 +17,7 @@ type templateData struct {
 	Patients    []*models.Patient
 	Medications []*models.Medication
 	Form        any
+	Flash       string
 }
 
 type patientCreateForm struct {
@@ -63,6 +64,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Patients = latest
+	flashMsg, err := app.popFlash(w, r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Flash = flashMsg
 	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
 
@@ -103,6 +110,12 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	err = app.setFlash(w, r, "Успешно добавен пациент")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
 	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
@@ -115,6 +128,12 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 	data.Patients = patients
+	flashMsg, err := app.popFlash(w, r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Flash = flashMsg
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
@@ -129,6 +148,12 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 
 	data := app.newTemplateData(r)
 	data.Patients = patients
+	flashMsg, err := app.popFlash(w, r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Flash = flashMsg
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
@@ -159,6 +184,12 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 	data.Patient = patient
 	data.Medications = medications
 	data.Form = &patientEditForm{}
+	flashMsg, err := app.popFlash(w, r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Flash = flashMsg
 	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
@@ -193,6 +224,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Успешно обновени данни")
 	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
@@ -209,6 +241,7 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Пациентът е изтрит")
 	http.Redirect(w, r, "/patients/", http.StatusSeeOther)
 }
 
@@ -223,7 +256,8 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			app.notFound(w)
+			app.setFlash(w, r, "Не съществува пациент с такъв ЕГН")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
 		}
@@ -243,6 +277,12 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.Medications = medications
 	data.Form = &medicationAddForm{}
+	flashMsg, err := app.popFlash(w, r)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	data.Flash = flashMsg
 	app.render(w, http.StatusOK, "medications.tmpl.html", data)
 }
 
@@ -269,6 +309,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Успешно добавен медикамент")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
@@ -292,5 +333,6 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	app.setFlash(w, r, "Медикаментът бе изтрит")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
