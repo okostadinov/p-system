@@ -4,10 +4,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/justinas/alice"
 )
 
 // registers the routes to a mux assigned to the server
-func (app *application) routes() *mux.Router {
+func (app *application) routes() http.Handler {
 	mux := mux.NewRouter()
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
@@ -29,5 +30,8 @@ func (app *application) routes() *mux.Router {
 	medicationsRouter.HandleFunc("/", app.medicationList).Methods("GET")
 	medicationsRouter.HandleFunc("/", app.medicationAdd).Methods("POST")
 	medicationsRouter.HandleFunc("/delete", app.medicationDelete).Methods("POST")
-	return mux
+
+	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+
+	return standard.Then(mux)
 }
