@@ -53,9 +53,10 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 }
 
 // prepares a template data struct with common dynamic data
-func (app *application) newTemplateData(r *http.Request) *templateData {
+func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
+		Flash:       app.popFlash(w, r),
 	}
 }
 
@@ -126,10 +127,10 @@ func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg str
 }
 
 // pops the flash message from the current session and returns it
-func (app *application) popFlash(w http.ResponseWriter, r *http.Request) (string, error) {
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) string {
 	session, err := app.store.Get(r, "session")
 	if err != nil {
-		return "", err
+		return ""
 	}
 
 	var flashMsg string
@@ -139,8 +140,8 @@ func (app *application) popFlash(w http.ResponseWriter, r *http.Request) (string
 
 	err = session.Save(r, w)
 	if err != nil {
-		return "", err
+		return ""
 	}
 
-	return flashMsg, nil
+	return flashMsg
 }

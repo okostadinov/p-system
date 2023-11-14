@@ -62,15 +62,8 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash, err := app.popFlash(w, r)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = latest
-	data.Flash = flash
 	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
 
@@ -81,7 +74,7 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Medications = medications
 	data.Form = &patientCreateForm{}
 	app.render(w, http.StatusOK, "create.tmpl.html", data)
@@ -102,7 +95,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 			return
 		}
 
-		data := app.newTemplateData(r)
+		data := app.newTemplateData(w, r)
 		data.Medications = medications
 		form.FieldErrors = errors
 		data.Form = form
@@ -132,15 +125,8 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash, err := app.popFlash(w, r)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = patients
-	data.Flash = flash
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
@@ -153,15 +139,8 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	flash, err := app.popFlash(w, r)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = patients
-	data.Flash = flash
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
 
@@ -188,17 +167,10 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash, err := app.popFlash(w, r)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patient = patient
 	data.Medications = medications
 	data.Form = &patientEditForm{}
-	data.Flash = flash
 	app.render(w, http.StatusOK, "view.tmpl.html", data)
 }
 
@@ -229,7 +201,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data := app.newTemplateData(r)
+		data := app.newTemplateData(w, r)
 		data.Medications = medications
 		form.FieldErrors = errors
 		data.Form = form
@@ -294,16 +266,9 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	flash, err := app.popFlash(w, r)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Medications = medications
 	data.Form = &medicationAddForm{}
-	data.Flash = flash
 	app.render(w, http.StatusOK, "medications.tmpl.html", data)
 }
 
@@ -322,7 +287,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data := app.newTemplateData(r)
+		data := app.newTemplateData(w, r)
 		form.FieldErrors = errors
 		data.Form = form
 		data.Medications = medications
