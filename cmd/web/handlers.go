@@ -17,6 +17,7 @@ type templateData struct {
 	Patients    []*models.Patient
 	Medications []*models.Medication
 	Form        any
+	Flash       string
 }
 
 type patientCreateForm struct {
@@ -61,7 +62,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = latest
 	app.render(w, http.StatusOK, "home.tmpl.html", data)
 }
@@ -73,7 +74,7 @@ func (app *application) patientCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Medications = medications
 	data.Form = &patientCreateForm{}
 	app.render(w, http.StatusOK, "create.tmpl.html", data)
@@ -88,16 +89,27 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 	}
 
 	if ok, errors := app.validateForm(form); !ok {
-		data := app.newTemplateData(r)
+		medications, err := app.medications.GetAll()
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+
+		data := app.newTemplateData(w, r)
+		data.Medications = medications
 		form.FieldErrors = errors
 		data.Form = form
-		// TODO: replace later with session context
-		data.Medications, _ = app.medications.GetAll()
 		app.render(w, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 		return
 	}
 
 	id, err := app.patients.Insert(form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.setFlash(w, r, "Пациентът бе добавен успешно")
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -113,7 +125,7 @@ func (app *application) patientList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = patients
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
@@ -127,7 +139,7 @@ func (app *application) patientListFiltered(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patients = patients
 	app.render(w, http.StatusOK, "list.tmpl.html", data)
 }
@@ -155,7 +167,7 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Patient = patient
 	data.Medications = medications
 	data.Form = &patientEditForm{}
@@ -177,12 +189,23 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if ok, errors := app.validateForm(form); !ok {
-		data := app.newTemplateData(r)
+		medications, err := app.medications.GetAll()
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+
+		patient, err := app.patients.Get(id)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+
+		data := app.newTemplateData(w, r)
+		data.Medications = medications
 		form.FieldErrors = errors
 		data.Form = form
-		// TODO: replace later with session context
-		data.Patient, _ = app.patients.Get(id)
-		data.Medications, _ = app.medications.GetAll()
+		data.Patient = patient
 		app.render(w, http.StatusUnprocessableEntity, "view.tmpl.html", data)
 		return
 	}
@@ -193,6 +216,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Данните бяха обновени успешно")
 	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
@@ -209,6 +233,7 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Пациентът бе изтрит успешно")
 	http.Redirect(w, r, "/patients/", http.StatusSeeOther)
 }
 
@@ -223,7 +248,8 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			app.notFound(w)
+			app.setFlash(w, r, "Не съществува пациент с такъв ЕГН")
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
 		}
@@ -240,7 +266,7 @@ func (app *application) medicationList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := app.newTemplateData(r)
+	data := app.newTemplateData(w, r)
 	data.Medications = medications
 	data.Form = &medicationAddForm{}
 	app.render(w, http.StatusOK, "medications.tmpl.html", data)
@@ -255,10 +281,16 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if ok, errors := app.validateForm(form); !ok {
-		data := app.newTemplateData(r)
+		medications, err := app.medications.GetAll()
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+
+		data := app.newTemplateData(w, r)
 		form.FieldErrors = errors
 		data.Form = form
-		data.Medications, _ = app.medications.GetAll()
+		data.Medications = medications
 		app.render(w, http.StatusUnprocessableEntity, "medications.tmpl.html", data)
 		return
 	}
@@ -269,6 +301,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.setFlash(w, r, "Медикаментът бе добавен успешно")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
@@ -282,8 +315,9 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(patients) > 0 {
-		http.Redirect(w, r, "/medications/", http.StatusForbidden)
-		// TODO: add message to request context once sessions are added
+		app.setFlash(w, r, "Медикаментът не може да бъде изтрит, поради записани с него пациенти")
+		http.Redirect(w, r, "/medications/", http.StatusSeeOther)
+		return
 	}
 
 	err = app.medications.Delete(name)
@@ -292,5 +326,6 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	app.setFlash(w, r, "Медикаментът бе изтрит успешно")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }

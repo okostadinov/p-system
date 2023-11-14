@@ -53,9 +53,10 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 }
 
 // prepares a template data struct with common dynamic data
-func (app *application) newTemplateData(r *http.Request) *templateData {
+func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
+		Flash:       app.popFlash(w, r),
 	}
 }
 
@@ -107,4 +108,40 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 	default:
 		return ""
 	}
+}
+
+// adds a flash message to the current session
+func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg string) error {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return err
+	}
+
+	session.AddFlash(msg, "message")
+	err = session.Save(r, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// pops the flash message from the current session and returns it
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) string {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return ""
+	}
+
+	var flashMsg string
+	if flashes := session.Flashes("message"); len(flashes) > 0 {
+		flashMsg = flashes[0].(string)
+	}
+
+	err = session.Save(r, w)
+	if err != nil {
+		return ""
+	}
+
+	return flashMsg
 }

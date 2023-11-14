@@ -37,3 +37,11 @@ div > label {
 .error + input, .error + textarea {
     border: 2px solid red;
 }
+
+.flash {
+    background-color: lightgoldenrodyellow;
+    padding: 10px 16px;
+    font-size: 1.25rem;
+    color: midnightblue;
+    text-align: center;
+}

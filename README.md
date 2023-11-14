@@ -15,6 +15,7 @@ P-System is a webapp used as a database for patient entities and data associated
 * search for a specific patient based on national ID
 * dynamic html
 * form validations
+* session flash messages
 
 ### Setup
 
