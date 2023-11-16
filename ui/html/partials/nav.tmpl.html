@@ -1,12 +1,29 @@
 {{define "nav"}}
-<nav>
-    <a href="/">Начало</a>
-    <a href="/patients/create">Създай нов пациент</a>
-    <a href="/patients/">Всички пациенти</a>
-    <a href="/medications/">Медикаменти</a>
-    <form action="/patients/search" method="POST" novalidate>
-        <input type="search" name="q" id="ucn" placeholder="ЕГН">
-        <input type="submit" value="Търси">
-    </form>
+<nav class="navbar navbar-expand-md">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Начало</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/patients/create">Нов пациент</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/patients/">Всички пациенти</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/medications/">Медикаменти</a>
+                </li>
+            </ul>
+            <form class="d-flex" action="/patients/search" method="POST" novalidate>
+                <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="ЕГН">
+                <input type="submit" class="btn btn-outline-secondary" value="Търси">
+            </form>
+        </div>
+    </div>
 </nav>
 {{end}}

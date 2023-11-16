@@ -15,21 +15,38 @@
         </div>
     </form>
     {{if .Medications}}
-    <table>
-        <tr>
-            <th>Наименование</th>
-        </tr>        
+    <ul class="list-group">
         {{range .Medications}}
+        <li class="list-group-item d-flex">
+            <a class="list-group-item list-group-item-action list-group-item-light" href="/patients/medication/{{.Name}}">{{.Name}}</a>
+            <form action="/medications/delete" method="POST">
+                <input type="hidden" name="name" value="{{.Name}}">
+                <input type="submit" class="btn btn-danger" value="Изтрий">
+            </form>
+        </li>
+
+        {{end}}
+    </ul>
+    <table class="table">
+        <thead>
             <tr>
-                <td><a href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
-                <td>
+                <th scope="col">Наименование</th>
+                <th scope="col"></th>
+            </tr>        
+        </thead>
+        <tbody>
+            {{range .Medications}}
+            <tr>
+                <td scope="col"><a class="h4" href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
+                <td scope="col">
                     <form action="/medications/delete" method="POST">
                         <input type="hidden" name="name" value="{{.Name}}">
-                        <input type="submit" value="Изтрий">
+                        <input type="submit" class="btn btn-danger" value="Изтрий">
                     </form>
                 </td>
             </tr>
-        {{end}}
+            {{end}}
+        </tbody>
     </table>
     {{end}}
 {{end}}

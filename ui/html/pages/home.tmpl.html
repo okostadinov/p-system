@@ -3,20 +3,26 @@
 {{define "main"}}
     <h1>Последно добавени пациенти</h1>
     {{if .Patients}}
-        <table>
-            <tr>
-                <th>Име</th>
-                <th>Номер</th>
-                <th>Медикамент</th>
-            </tr>
-            {{range .Patients}}
-            <tr>
-                <td><a href="/patients/{{.ID}}">{{.FirstName}} {{.LastName}}</a></td>
-                <td><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
-                <td>{{.Medication}}</td>
-            </tr>
-            {{end}}
-        </table>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Име</th>
+                        <th scope="col">Номер</th>
+                        <th scope="col">Медикамент</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .Patients}}
+                    <tr>
+                        <td scope="col"><a href="/patients/{{.ID}}">{{.FirstName}} {{.LastName}}</a></td>
+                        <td scope="col"><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
+                        <td scope="col">{{.Medication}}</td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
     {{else}}
         <p>В момента няма пациенти, добави нов от <a href="/patients/create">тук</a></p>
     {{end}}

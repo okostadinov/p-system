@@ -4,66 +4,66 @@
     <h1>Нов Пациент</h1>
     {{if .Medications}}
         <form action="/patients/create" method="POST" novalidate>
-            <div>
-                <label for="ucn">ЕГН</label>
+            <div class="mb-3">
+                <label for="ucn" class="form-label">ЕГН</label>
                 {{with .Form.FieldErrors.ucn}}
                     <label for="ucn" class="error">{{.}}</label>
                 {{end}}
-                <input name="ucn" id="ucn" type="text" value="{{.Form.UCN}}">
+                <input name="ucn" id="ucn" type="text" class="form-control" value="{{.Form.UCN}}">
             </div>
-            <div>
-                <label for="first_name">Име</label>
+            <div class="mb-3">
+                <label for="first_name" class="form-label">Име</label>
                 {{with .Form.FieldErrors.first_name}}
                     <label for="first_name" class="error">{{.}}</label>
                 {{end}}
-                <input name="first_name" id="first_name" type="text" value="{{.Form.FirstName}}">
+                <input name="first_name" id="first_name" type="text" class="form-control" value="{{.Form.FirstName}}">
             </div>
-            <div>
-                <label for="last_name">Фамилия</label>
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Фамилия</label>
                 {{with .Form.FieldErrors.last_name}}
                     <label for="last_name" class="error">{{.}}</label>
                 {{end}}
-                <input name="last_name" id="last_name" type="text" value="{{.Form.LastName}}">
+                <input name="last_name" id="last_name" type="text" class="form-control" value="{{.Form.LastName}}">
             </div>
-            <div>
-                <label for="phone_number">Номер</label>
+            <div class="mb-3">
+                <label for="phone_number" class="form-label">Номер</label>
                 {{with .Form.FieldErrors.phone_number}}
                     <label for="phone_number" class="error">{{.}}</label>
                 {{end}}
-                <input name="phone_number" id="phone_number" type="text" value="{{.Form.PhoneNumber}}">
+                <input name="phone_number" id="phone_number" type="text" class="form-control" value="{{.Form.PhoneNumber}}">
             </div>
-            <div>
-                <label for="height">Ръст</label>
+            <div class="mb-3">
+                <label for="height" class="form-label">Ръст</label>
                 {{with .Form.FieldErrors.height}}
                     <label for="height" class="error">{{.}}</label>
                 {{end}}
-                <input name="height" id="height" type="number" value="{{.Form.Height}}">
+                <input name="height" id="height" type="number" class="form-control" value="{{.Form.Height}}">
             </div>
-            <div>
-                <label for="weight">Тегло</label>
+            <div class="mb-3">
+                <label for="weight" class="form-label">Тегло</label>
                 {{with .Form.FieldErrors.weight}}
                     <label for="weight" class="error">{{.}}</label>
                 {{end}}
-                <input name="weight" id="weight" type="number" value="{{.Form.Weight}}">
+                <input name="weight" id="weight" type="number" class="form-control" value="{{.Form.Weight}}">
             </div>
-            <div>
-                <label for="medication">Медикамент</label>
-                <select name="medication" id="medication">
+            <div class="mb-3">
+                <label for="medication" class="form-label">Медикамент</label>
+                <select name="medication" id="medication" class="form-select">
                     {{$p := .Form.Medication}}
                     {{range .Medications}}
                        <option value="{{.Name}}" {{if eq $p .Name}}selected{{end}}>{{.Name}}</option>
                     {{end}}
                 </select>
             </div>
-            <div>
-                <label for="note">Допълнително</label>
+            <div class="mb-3">
+                <label for="note" class="form-label">Допълнително</label>
                 {{with .Form.FieldErrors.note}}
                     <label for="note" class="error">{{.}}</label>
                 {{end}}
-                <textarea name="note" id="note">{{.Form.Note}}</textarea>
+                <textarea name="note" id="note" class="form-control" rows="3">{{.Form.Note}}</textarea>
             </div>
             <div>
-                <input type="submit" value="Създай пациент">
+                <input type="submit" class="btn btn-primary" value="Създай пациент">
             </div>
         </form>
     {{else}}
