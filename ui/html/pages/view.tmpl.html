@@ -1,126 +1,157 @@
 {{define "title"}}Patient #{{.Patient.ID}}{{end}}
 
 {{define "main"}}
-    {{if .Patient}}
-    <h1>Пациент: {{.Patient.FirstName}} {{.Patient.LastName}}</h1>
-    <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
-        <div class="row">
-            <div class="col-3">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.ucn}}
-                    <label for="ucn" class="error">{{.}}</label>
-                    {{end}}    
-                    <input name="ucn" id="ucn" type="text" class="form-control" placeholder="ЕГН" value="{{.Patient.UCN}}">
+{{if .Patient}}
+<h1>Пациент: {{.Patient.FirstName}} {{.Patient.LastName}}</h1>
+<form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
+    <div class="row mb-3">
+        <div class="col-3">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.ucn}}is-invalid{{end}}">
+                    <input name="ucn" id="ucn" type="text"
+                        class="form-control {{if .Form.FieldErrors.ucn}}is-invalid{{end}}" placeholder="ЕГН"
+                        value="{{.Patient.UCN}}">
                     <label for="ucn">ЕГН</label>
                 </div>
+                {{with .Form.FieldErrors.ucn}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
-            <div class="col">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.first_name}}
-                    <label for="first_name" class="error">{{.}}</label>
-                    {{end}}    
-                    <input name="first_name" id="first_name" type="text" class="form-control" placeholder="Име" value="{{.Patient.FirstName}}">
+        </div>
+        <div class="col">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.first_name}}is-invalid{{end}}">
+                    <input name="first_name" id="first_name" type="text"
+                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}" placeholder="Име"
+                        value="{{.Patient.FirstName}}">
                     <label for="first_name">Име</label>
                 </div>
+                {{with .Form.FieldErrors.first_name}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
-            <div class="col">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.last_name}}
-                    <label for="last_name" class="error">{{.}}</label>
-                    {{end}}    
-                    <input name="last_name" id="last_name" type="text" class="form-control" placeholder="Фамилия" value="{{.Patient.LastName}}">
+        </div>
+        <div class="col">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.last_name}}is-invalid{{end}}">
+                    <input name="last_name" id="last_name" type="text"
+                        class="form-control {{if .Form.FieldErrors.last_name}}is-invalid{{end}}" placeholder="Фамилия"
+                        value="{{.Patient.LastName}}">
                     <label for="last_name">Фамилия</label>
                 </div>
+                {{with .Form.FieldErrors.last_name}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.phone_number}}
-                    <label for="phone_number" class="error">{{.}}</label>
-                    {{end}}
-                    <input name="phone_number" id="phone_number" type="text" class="form-control" placeholder="Номер" value="{{.Patient.PhoneNumber}}">
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}">
+                    <input name="phone_number" id="phone_number" type="text"
+                        class="form-control {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}" placeholder="Номер"
+                        value="{{.Patient.PhoneNumber}}">
                     <label for="phone_number">Номер</label>
                 </div>
+                {{with .Form.FieldErrors.phone_number}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
-            <div class="col-2">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.height}}
-                    <label for="height" class="error">{{.}}</label>
-                    {{end}}    
-                    <input name="height" id="height" type="number" class="form-control" placeholder="Ръст" value="{{.Patient.Height}}">
+        </div>
+        <div class="col-2">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.height}}is-invalid{{end}}">
+                    <input name="height" id="height" type="number"
+                        class="form-control {{if .Form.FieldErrors.height}}is-invalid{{end}}" placeholder="Ръст"
+                        value="{{.Patient.Height}}">
                     <label for="height">Ръст</label>
                 </div>
+                {{with .Form.FieldErrors.height}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
-            <div class="col-2">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.weight}}
-                    <label for="weight" class="error">{{.}}</label>
-                    {{end}}    
-                    <input name="weight" id="weight" type="number" class="form-control" placeholder="Тегло" value="{{.Patient.Weight}}">
+        </div>
+        <div class="col-2">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.weight}}is-invalid{{end}}">
+                    <input name="weight" id="weight" type="number"
+                        class="form-control {{if .Form.FieldErrors.weight}}is-invalid{{end}}" placeholder="Тегло"
+                        value="{{.Patient.Weight}}">
                     <label for="weight">Тегло</label>
                 </div>
-            </div>
-            <div class="col">
-                <div class="form-floating mb-3">
-                    <select name="medication" id="medication" class="form-select">
-                        {{$p := .Patient}}
-                        {{range .Medications}}
-                        <option value="{{.Name}}"{{if eq $p.Medication .Name}}selected{{end}}>{{.Name}}</option>
-                        {{end}}
-                    </select>
-                    <label for="medication">Медикамент</label>
-                </div>
+                {{with .Form.FieldErrors.weight}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <div class="form-floating mb-3">
-                    {{with .Form.FieldErrors.note}}
-                    <label for="note" class="error">{{.}}</label>
-                    {{end}}    
-                    <textarea name="note" id="note" class="form-control" placeholder="Коментар">{{.Patient.Note}}</textarea>
+        <div class="col">
+            <div class="form-floating">
+                <select name="medication" id="medication" class="form-select">
+                    {{$p := .Patient}}
+                    {{range .Medications}}
+                    <option value="{{.Name}}" {{if eq $p.Medication .Name}}selected{{end}}>{{.Name}}</option>
+                    {{end}}
+                </select>
+                <label for="medication">Медикамент</label>
+            </div>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+            <div class="input-group has-validation">
+                <div class="form-floating {{if .Form.FieldErrors.note}}is-invalid{{end}}">
+                    <textarea name="note" id="note" class="form-control {{if .Form.FieldErrors.note}}is-invalid{{end}}"
+                        placeholder="Коментар">{{.Patient.Note}}</textarea>
                     <label for="note">Коментар</label>
                 </div>
+                {{with .Form.FieldErrors.note}}
+                <div class="invalid-feedback">{{.}}</div>
+                {{end}}
             </div>
         </div>
-        <div class="row">
-            <div class="col-3">
-                <div class="form-floating mb-3">
-                    <fieldset>
-                        <legend class="form-label h6">Одобрен</legend>
-                        <div class="form-check-inline">
-                            <input name="approved" id="approved1" type="radio" class="btn-check" value="true" {{if .Patient.Approved}}checked{{end}}>
-                            <label for="approved1" class="btn btn-outline-primary">Да</label>
-                        </div>
-                        <div class="form-check-inline">
-                            <input name="approved" id="approved2" type="radio" class="btn-check" value="false" {{if not .Patient.Approved}}checked{{end}}>
-                            <label for="approved2" class="btn btn-outline-secondary">Не</label>
-                        </div>
-                    </fieldset>
-                </div>
-            </div>
-            <div class="col-3">
-                <div class="form-floating mb-3">
-                    <fieldset>
-                        <legend class="form-label h6">Първо продължение</legend>
-                        <div class="form-check-inline">
-                            <input name="first_continuation" id="firstCont1" type="radio" class="btn-check" value="true" {{if .Patient.FirstContinuation}}checked{{end}}>
-                            <label for="firstCont1" class="btn btn-outline-primary">Да</label>
-                        </div>
-                        <div class="form-check-inline">
-                            <input name="first_continuation" id="firstCont2" type="radio" class="btn-check" value="false" {{if not .Patient.FirstContinuation}}checked{{end}}>
-                            <label for="firstCont2" class="btn btn-outline-secondary">Не</label>
-                        </div>
-                    </fieldset>
-                </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-3">
+            <div class="form-floating">
+                <fieldset>
+                    <legend class="form-label h6">Одобрен</legend>
+                    <div class="form-check-inline">
+                        <input name="approved" id="approved1" type="radio" class="btn-check" value="true" {{if
+                            .Patient.Approved}}checked{{end}}>
+                        <label for="approved1" class="btn btn-outline-primary">Да</label>
+                    </div>
+                    <div class="form-check-inline">
+                        <input name="approved" id="approved2" type="radio" class="btn-check" value="false" {{if not
+                            .Patient.Approved}}checked{{end}}>
+                        <label for="approved2" class="btn btn-outline-secondary">Не</label>
+                    </div>
+                </fieldset>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <input type="submit" class="btn btn-primary" value="Запази">
+        <div class="col-3">
+            <div class="form-floating">
+                <fieldset>
+                    <legend class="form-label h6">Първо продължение</legend>
+                    <div class="form-check-inline">
+                        <input name="first_continuation" id="firstCont1" type="radio" class="btn-check" value="true"
+                            {{if .Patient.FirstContinuation}}checked{{end}}>
+                        <label for="firstCont1" class="btn btn-outline-primary">Да</label>
+                    </div>
+                    <div class="form-check-inline">
+                        <input name="first_continuation" id="firstCont2" type="radio" class="btn-check" value="false"
+                            {{if not .Patient.FirstContinuation}}checked{{end}}>
+                        <label for="firstCont2" class="btn btn-outline-secondary">Не</label>
+                    </div>
+                </fieldset>
             </div>
         </div>
-    </form> 
-    {{end}}
+    </div>
+    <div class="row">
+        <div class="col">
+            <input type="submit" class="btn btn-primary" value="Запази">
+        </div>
+    </div>
+</form>
+{{end}}
 {{end}}
