@@ -28,7 +28,5 @@ P-System is a webapp used as a database for patient entities and data associated
 
 ### TODO
 
-* authentication
-* sessions
 * tests
 * deployment
