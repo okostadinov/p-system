@@ -249,7 +249,7 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			app.setFlash(w, r, "Не съществува пациент с такъв ЕГН")
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
 		}

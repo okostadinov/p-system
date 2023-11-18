@@ -1,35 +1,36 @@
 {{define "title"}}Medications{{end}}
 
 {{define "main"}}
-    <h1>Медикаменти</h1>
-    <form action="/medications/" method="POST" novalidate>
-        <div>
-            <label for="name">Нов медикамент</label>
+<h1 class="mb-4">Медикаменти</h1>
+<form class="row align-items-center mb-3" action="/medications/" method="POST" novalidate>
+    <div class="col-5">
+        <div class="input-group has-validation">
+            <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
+                <input type="text" name="name" id="name"
+                    class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}" placeholder="Нов медикамент">
+                <label for="name">Нов медикамент</label>
+            </div>
             {{with .Form.FieldErrors.name}}
-                <label for="name" class="error">{{.}}</label>
+            <div class="invalid-feedback">{{.}}</div>
             {{end}}
-            <input type="text" name="name" id="name">
         </div>
-        <div>
-            <input type="submit" value="Добави">
-        </div>
-    </form>
-    {{if .Medications}}
-    <table>
-        <tr>
-            <th>Наименование</th>
-        </tr>        
-        {{range .Medications}}
-            <tr>
-                <td><a href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
-                <td>
-                    <form action="/medications/delete" method="POST">
-                        <input type="hidden" name="name" value="{{.Name}}">
-                        <input type="submit" value="Изтрий">
-                    </form>
-                </td>
-            </tr>
-        {{end}}
-    </table>
+    </div>
+    <div class="col {{if.Form.FieldErrors.name}}mb-4{{end}}">
+        <input type="submit" class="btn btn-outline-success btn-lg" value="Добави">
+    </div>
+    </div>
+</form>
+{{if .Medications}}
+<ul class="list-group list-group-flush" style="max-width: 500px;">
+    {{range .Medications}}
+        <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
+            href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
+            <form action="/medications/delete" method="POST">
+                <input type="hidden" name="name" value="{{.Name}}">
+                <input type="submit" class="btn btn-danger" value="Изтрий">
+            </form>
+        </a>
     {{end}}
+</ul>
+{{end}}
 {{end}}
