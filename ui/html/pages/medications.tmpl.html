@@ -1,7 +1,7 @@
 {{define "title"}}Medications{{end}}
 
 {{define "main"}}
-<h1>Медикаменти</h1>
+<h1 class="mb-4">Медикаменти</h1>
 <form class="row align-items-center mb-3" action="/medications/" method="POST" novalidate>
     <div class="col-5">
         <div class="input-group has-validation">
@@ -16,44 +16,21 @@
         </div>
     </div>
     <div class="col {{if.Form.FieldErrors.name}}mb-4{{end}}">
-        <input type="submit" class="btn btn-outline-primary" value="Добави">
+        <input type="submit" class="btn btn-outline-success btn-lg" value="Добави">
     </div>
     </div>
 </form>
 {{if .Medications}}
-<ul class="list-group">
+<ul class="list-group list-group-flush" style="max-width: 500px;">
     {{range .Medications}}
-    <li class="list-group-item d-flex">
-        <a class="list-group-item list-group-item-action list-group-item-light"
-            href="/patients/medication/{{.Name}}">{{.Name}}</a>
-        <form action="/medications/delete" method="POST">
-            <input type="hidden" name="name" value="{{.Name}}">
-            <input type="submit" class="btn btn-danger" value="Изтрий">
-        </form>
-    </li>
-
+        <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
+            href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
+            <form action="/medications/delete" method="POST">
+                <input type="hidden" name="name" value="{{.Name}}">
+                <input type="submit" class="btn btn-danger" value="Изтрий">
+            </form>
+        </a>
     {{end}}
 </ul>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Наименование</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        {{range .Medications}}
-        <tr>
-            <td scope="col"><a class="h4" href="/patients/medication/{{.Name}}">{{.Name}}</a></td>
-            <td scope="col">
-                <form action="/medications/delete" method="POST">
-                    <input type="hidden" name="name" value="{{.Name}}">
-                    <input type="submit" class="btn btn-danger" value="Изтрий">
-                </form>
-            </td>
-        </tr>
-        {{end}}
-    </tbody>
-</table>
 {{end}}
 {{end}}

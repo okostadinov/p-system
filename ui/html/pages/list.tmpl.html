@@ -1,10 +1,10 @@
 {{define "title"}}All Patients{{end}}
 
 {{define "main"}}
-    <h1>Всички Пациенти</h1>
+    <h1 class="mb-4">Всички Пациенти</h1>
     {{if .Patients}}
         <div class="table-responsive">
-            <table class="table table-striped">
+            <table class="table table-striped align-middle">
                 <thead>
                     <tr>
                         <th scope="col">ЕГН</th>
@@ -26,7 +26,7 @@
                         <td scope="col"><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
                         <td scope="col">{{.Height}}</td>
                         <td scope="col">{{.Weight}}</td>
-                        <td scope="col">{{.Medication}}</td>
+                        <td scope="col"><a href="/patients/medication/{{.Medication}}">{{.Medication}}</a></td>
                         <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if .Approved}}checked{{end}}></td>
                         <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if .FirstContinuation}}checked{{end}}></td>
                         <td scope="col">

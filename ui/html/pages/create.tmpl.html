@@ -1,7 +1,7 @@
 {{define "title"}}New Patient{{end}}
 
 {{define "main"}}
-<h1>Нов Пациент</h1>
+<h1 class="mb-4">Нов Пациент</h1>
 {{if .Medications}}
 <form action="/patients/create" method="POST" novalidate>
     <div class="row mb-3">
@@ -102,7 +102,7 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FieldErrors.note}}is-invalid{{end}}">
                     <textarea name="note" id="note" class="form-control {{if .Form.FieldErrors.note}}is-invalid{{end}}"
-                        placeholder="Допълнително">{{.Form.Note}}</textarea>
+                        placeholder="Допълнително" style="min-height: 150px;">{{.Form.Note}}</textarea>
                     <label for="note">Допълнително</label>
                 </div>
                 {{with .Form.FieldErrors.note}}
@@ -113,7 +113,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <input type="submit" class="btn btn-primary" value="Създай пациент">
+            <input type="submit" class="btn btn-success btn-lg" value="Създай пациент">
         </div>
     </div>
 </form>

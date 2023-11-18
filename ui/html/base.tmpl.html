@@ -17,7 +17,7 @@
     </header>
     <main class="container">
         {{with .Flash}}
-            <p class="flash">{{.}}</p>
+           <div class="alert alert-info" role="alert">{{.}}</div> 
         {{end}}
         {{template "main" .}}
     </main>

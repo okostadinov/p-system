@@ -2,7 +2,7 @@
 
 {{define "main"}}
 {{if .Patient}}
-<h1>Пациент: {{.Patient.FirstName}} {{.Patient.LastName}}</h1>
+<h1 class="mb-4">Пациент: {{.Patient.FirstName}} {{.Patient.LastName}}</h1>
 <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
     <div class="row mb-3">
         <div class="col-3">
@@ -102,7 +102,7 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FieldErrors.note}}is-invalid{{end}}">
                     <textarea name="note" id="note" class="form-control {{if .Form.FieldErrors.note}}is-invalid{{end}}"
-                        placeholder="Коментар">{{.Patient.Note}}</textarea>
+                        placeholder="Коментар" style="min-height: 150px;">{{.Patient.Note}}</textarea>
                     <label for="note">Коментар</label>
                 </div>
                 {{with .Form.FieldErrors.note}}
@@ -149,7 +149,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <input type="submit" class="btn btn-primary" value="Запази">
+            <input type="submit" class="btn btn-success btn-lg" value="Запази">
         </div>
     </div>
 </form>
