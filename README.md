@@ -24,9 +24,11 @@ P-System is a webapp used as a database for patient entities and data associated
 * a mysql db needs to be set beforehand
 * clone the repo
 * `cd` into the project folder
-* `go run ./cmd/web`
+* to run the project `go run ./cmd/web`
+* to build an executable `go build ./cmd/web`
 
 ### TODO
 
+* authentication
 * tests
 * deployment
