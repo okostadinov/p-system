@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -8,12 +9,14 @@ import (
 	"net/http"
 	"os"
 	"reflect"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/srinathgs/mysqlstore"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
+	"github.com/gorilla/sessions"
 	"p-system.okostadinov.net/internal/models"
 )
 
@@ -33,6 +36,7 @@ var validate *validator.Validate
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
+	storeKey := flag.String("storekey", "secretkey", "MySQL session store key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -50,9 +54,16 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte("secretkey"))
+	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(*storeKey))
 	if err != nil {
 		errorLog.Fatal(err)
+	}
+
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   864000 * 7,
+		HttpOnly: true,
+		Secure:   true,
 	}
 
 	defer store.Close()
@@ -68,13 +79,21 @@ func main() {
 		store:         store,
 	}
 
-	srv := &http.Server{
-		Addr:     *addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
 	}
 
-	errorLog.Fatal(srv.ListenAndServe())
+	srv := &http.Server{
+		Addr:         *addr,
+		ErrorLog:     errorLog,
+		Handler:      app.routes(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	errorLog.Fatal(srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }
 
 func openDB(dsn string) (*sql.DB, error) {
