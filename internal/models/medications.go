@@ -20,18 +20,6 @@ func (m *MedicationModel) Insert(name string) error {
 	return nil
 }
 
-func (m *MedicationModel) Get(name string) (*Medication, error) {
-	var med Medication
-
-	stmt := "SELECT * FROM medications WHERE name = ?"
-	err := m.DB.QueryRow(stmt, name).Scan(&med.Name)
-	if err != nil {
-		return nil, err
-	}
-
-	return &med, nil
-}
-
 func (m *MedicationModel) GetAll() ([]*Medication, error) {
 	var medications []*Medication
 

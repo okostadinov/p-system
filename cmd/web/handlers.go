@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"net/http"
@@ -53,6 +52,14 @@ type medicationAddForm struct {
 
 type searchByUCNForm struct {
 	UCN string `schema:"q"`
+}
+
+type userSignupForm struct {
+	Name            string `schema:"name" validate:"required"`
+	Email           string `schema:"email" validate:"required,email"`
+	Password        string `schema:"password" validate:"required,password"`
+	ConfirmPassword string `schema:"confirm_password" validate:"required,password,eqfield=Password"`
+	FieldErrors     `schema:"-"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +160,7 @@ func (app *application) patientView(w http.ResponseWriter, r *http.Request) {
 
 	patient, err := app.patients.Get(id)
 	if err != nil {
-		if errors.Is(sql.ErrNoRows, err) {
+		if errors.Is(err, models.ErrNoRecord) {
 			app.notFound(w)
 		} else {
 			app.serverError(w, err)
@@ -247,7 +254,7 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+		if errors.Is(err, models.ErrNoRecord) {
 			app.setFlash(w, r, "Не съществува пациент с такъв ЕГН")
 			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 		} else {
@@ -329,3 +336,56 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	app.setFlash(w, r, "Медикаментът бе изтрит успешно")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
+
+func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(w, r)
+
+	data.Form = &userSignupForm{}
+	app.render(w, http.StatusOK, "signup.tmpl.html", data)
+}
+
+func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
+	var form userSignupForm
+	err := app.decodeForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	if ok, errors := app.validateForm(form); !ok {
+		data := app.newTemplateData(w, r)
+		form.FieldErrors = errors
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		return
+	}
+
+	err = app.users.Insert(form.Name, form.Email, form.Password)
+	if err != nil {
+		if errors.Is(err, models.ErrDuplicateEmail) {
+			data := app.newTemplateData(w, r)
+			form.FieldErrors = make(FieldErrors)
+			form.FieldErrors["email"] = "email address already in use"
+			data.Form = form
+			app.render(w, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
+		} else {
+			app.serverError(w, err)
+		}
+		return
+	}
+
+	err = app.setFlash(w, r, "Registration successful!")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	data := app.newTemplateData(w, r)
+	data.Form = form
+	app.render(w, http.StatusOK, "signup.tmpl.html", data)
+	// http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+}
+
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request)     {}
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {}
+func (app *application) userLogout(w http.ResponseWriter, r *http.Request)    {}

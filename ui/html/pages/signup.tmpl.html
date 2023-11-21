@@ -1,0 +1,50 @@
+{{define "title"}}Signup{{end}}
+
+{{define "main"}}
+<h1 class="mb-4">Signup</h1>
+<form action="/users/signup" style="max-width: 500px;" method="POST" novalidate>
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
+            <input name="name" id="name" type="text" class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}"
+                placeholder="Name" value="{{.Form.Name}}">
+            <label for="name">Name</label>
+        </div>
+        {{with .Form.FieldErrors.name}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.email}}is-invalid{{end}}">
+            <input name="email" id="email" type="email"
+                class="form-control {{if .Form.FieldErrors.email}}is-invalid{{end}}" placeholder="Email"
+                value="{{.Form.Email}}">
+            <label for="email">Email</label>
+        </div>
+        {{with .Form.FieldErrors.email}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.password}}is-invalid{{end}}">
+            <input name="password" id="password" type="password"
+                class="form-control {{if .Form.FieldErrors.password}}is-invalid{{end}}" placeholder="Password">
+            <label for="password">Password</label>
+        </div>
+        {{with .Form.FieldErrors.password}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.confirm_password}}is-invalid{{end}}">
+            <input name="confirm_password" id="confirm_password" type="password"
+                class="form-control {{if .Form.FieldErrors.confirm_password}}is-invalid{{end}}"
+                placeholder="Confirm Password">
+            <label for="confirm_password">Confirm Password</label>
+        </div>
+        {{with .Form.FieldErrors.confirm_password}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <input type="submit" class="btn btn-success btn-lg" value="Signup">
+</form>
+{{end}}

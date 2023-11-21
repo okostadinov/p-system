@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 )
 
 type Patient struct {
@@ -44,7 +45,11 @@ func (m *PatientModel) Get(id int) (*Patient, error) {
 	stmt := "SELECT * FROM patients WHERE id = ?"
 	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
 	}
 
 	return &p, nil
@@ -56,7 +61,11 @@ func (m *PatientModel) GetByUCN(ucn string) (*Patient, error) {
 	stmt := "SELECT * FROM patients WHERE ucn = ?"
 	err := m.DB.QueryRow(stmt, ucn).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
 	}
 
 	return &p, nil

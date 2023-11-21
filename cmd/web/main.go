@@ -25,6 +25,7 @@ type application struct {
 	errorLog      *log.Logger
 	medications   *models.MedicationModel
 	patients      *models.PatientModel
+	users         *models.UserModel
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
 	validator     *validator.Validate
@@ -73,6 +74,7 @@ func main() {
 		errorLog:      errorLog,
 		medications:   &models.MedicationModel{DB: db},
 		patients:      &models.PatientModel{DB: db},
+		users:         &models.UserModel{DB: db},
 		templateCache: templateCache,
 		decoder:       schema.NewDecoder(),
 		validator:     setupValidator(),
@@ -113,5 +115,6 @@ func setupValidator() *validator.Validate {
 		return field.Tag.Get("schema")
 	})
 
+	validate.RegisterValidation("password", passwordValidate)
 	return validate
 }

@@ -31,6 +31,13 @@ func (app *application) routes() http.Handler {
 	medicationsRouter.HandleFunc("/", app.medicationAdd).Methods("POST")
 	medicationsRouter.HandleFunc("/delete", app.medicationDelete).Methods("POST")
 
+	userRouter := mux.PathPrefix("/users").Subrouter()
+	userRouter.HandleFunc("/signup", app.userSignup).Methods("GET")
+	userRouter.HandleFunc("/signup", app.userSignupPost).Methods("POST")
+	userRouter.HandleFunc("/login", app.userLogin).Methods("GET")
+	userRouter.HandleFunc("/login", app.userLoginPost).Methods("POST")
+	userRouter.HandleFunc("/logout", app.userLogout).Methods("POST")
+
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
 	return standard.Then(mux)
