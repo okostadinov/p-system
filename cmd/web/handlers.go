@@ -16,7 +16,7 @@ type templateData struct {
 	Patients    []*models.Patient
 	Medications []*models.Medication
 	Form        any
-	Flash       string
+	Flash       Flash
 }
 
 type patientCreateForm struct {
@@ -60,6 +60,12 @@ type userSignupForm struct {
 	Password        string `schema:"password" validate:"required,password"`
 	ConfirmPassword string `schema:"confirm_password" validate:"required,password,eqfield=Password"`
 	FieldErrors     `schema:"-"`
+}
+
+type userLoginForm struct {
+	Email       string `schema:"email" validate:"required,email"`
+	Password    string `schema:"password" validate:"required,password"`
+	FieldErrors `schema:"-"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -116,7 +122,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = app.setFlash(w, r, "Patient successfully added!")
+	err = app.setFlash(w, r, "Patient successfully added!", "success")
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -223,7 +229,11 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Patient successfully updated!")
+	err = app.setFlash(w, r, "Patient successfully updated!", "success")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
@@ -240,7 +250,11 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Patient successfully deleted!")
+	err = app.setFlash(w, r, "Patient successfully deleted!", "success")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	http.Redirect(w, r, "/patients/", http.StatusSeeOther)
 }
 
@@ -255,7 +269,11 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
-			app.setFlash(w, r, "No such patient with this UCN")
+			err = app.setFlash(w, r, "No patients exists with this UCN.", "warning")
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
 			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
@@ -308,7 +326,11 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Medicationът successfully added!")
+	err = app.setFlash(w, r, "Medication successfully added!", "success")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
@@ -322,7 +344,11 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(patients) > 0 {
-		app.setFlash(w, r, "Medication cannot be deleted due to registed patients.")
+		err = app.setFlash(w, r, "Medication cannot be deleted due to registed patients.", "warning")
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
 		http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 		return
 	}
@@ -333,13 +359,16 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	app.setFlash(w, r, "Medication successfully deleted!")
+	err = app.setFlash(w, r, "Medication successfully deleted!", "success")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
 func (app *application) userSignup(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(w, r)
-
 	data.Form = &userSignupForm{}
 	app.render(w, http.StatusOK, "signup.tmpl.html", data)
 }
@@ -374,18 +403,36 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Registration successful!")
+	err = app.setFlash(w, r, "Registration successful! You may now log in.", "success")
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 
-	data := app.newTemplateData(w, r)
-	data.Form = form
-	app.render(w, http.StatusOK, "signup.tmpl.html", data)
-	// http.Redirect(w, r, "/users/login", http.StatusSeeOther)
+	http.Redirect(w, r, "/users/login", http.StatusSeeOther)
 }
 
-func (app *application) userLogin(w http.ResponseWriter, r *http.Request)     {}
-func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {}
-func (app *application) userLogout(w http.ResponseWriter, r *http.Request)    {}
+func (app *application) userLogin(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(w, r)
+	data.Form = &userLoginForm{}
+	app.render(w, http.StatusOK, "login.tmpl.html", data)
+}
+
+func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
+	var form userLoginForm
+	err := app.decodeForm(r, &form)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	if ok, errors := app.validateForm(form); !ok {
+		data := app.newTemplateData(w, r)
+		form.FieldErrors = errors
+		data.Form = form
+		app.render(w, http.StatusUnprocessableEntity, "login.tmpl.html", data)
+		return
+	}
+}
+
+func (app *application) userLogout(w http.ResponseWriter, r *http.Request) {}

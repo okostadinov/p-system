@@ -6,7 +6,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
@@ -20,7 +20,11 @@
                     <a class="nav-link" href="/medications/">Medications</a>
                 </li>
             </ul>
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <form class="d-flex mx-auto" action="/patients/search" method="POST" novalidate>
+                <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="UCN">
+                <input type="submit" class="btn btn-outline-secondary" value="Search">
+            </form>
+            <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item">
                     <a href="/users/signup" class="nav-link">Signup</a>
                 </li>
@@ -33,10 +37,6 @@
                     </form>
                 </li>
             </ul>
-            <form class="d-flex" action="/patients/search" method="POST" novalidate>
-                <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="UCN">
-                <input type="submit" class="btn btn-outline-secondary" value="Search">
-            </form>
         </div>
     </div>
 </nav>

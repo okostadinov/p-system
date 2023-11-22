@@ -11,6 +11,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+type Flash struct {
+	Content   string
+	FlashType string
+}
+
 type FieldErrors map[string]string
 
 // outputs the error to the client, as well as logging it locally for debugging
@@ -110,19 +115,22 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 		return "invalid format (requires minimum 8 characters, including letters and numbers)"
 	case "eqfield":
 		return fmt.Sprintf("field does not equal %s", param)
+	case "email":
+		return "invalid format (e.g. email@example.com)"
 	default:
 		return "undefined error"
 	}
 }
 
 // adds a flash message to the current session
-func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg string) error {
+func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content string, flashType string) error {
 	session, err := app.store.Get(r, "session")
 	if err != nil {
 		return err
 	}
 
-	session.AddFlash(msg, "message")
+	flash := Flash{Content: content, FlashType: flashType}
+	session.AddFlash(flash)
 	err = session.Save(r, w)
 	if err != nil {
 		return err
@@ -132,23 +140,18 @@ func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg str
 }
 
 // pops the flash message from the current session and returns it
-func (app *application) popFlash(w http.ResponseWriter, r *http.Request) string {
-	session, err := app.store.Get(r, "session")
-	if err != nil {
-		return ""
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
+	flash := &Flash{}
+
+	session, _ := app.store.Get(r, "session")
+
+	if flashes := session.Flashes(); len(flashes) > 0 {
+		flash = flashes[0].(*Flash)
 	}
 
-	var flashMsg string
-	if flashes := session.Flashes("message"); len(flashes) > 0 {
-		flashMsg = flashes[0].(string)
-	}
+	session.Save(r, w)
 
-	err = session.Save(r, w)
-	if err != nil {
-		return ""
-	}
-
-	return flashMsg
+	return *flash
 }
 
 // validates whether a string is at least 8 characters long and includes both letters and numbers

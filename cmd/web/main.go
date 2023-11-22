@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"database/sql"
+	"encoding/gob"
 	"flag"
 	"html/template"
 	"log"
@@ -69,6 +70,8 @@ func main() {
 
 	defer store.Close()
 
+	registerFlashType()
+
 	app := &application{
 		infoLog:       infoLog,
 		errorLog:      errorLog,
@@ -117,4 +120,8 @@ func setupValidator() *validator.Validate {
 
 	validate.RegisterValidation("password", passwordValidate)
 	return validate
+}
+
+func registerFlashType() {
+	gob.Register(&Flash{})
 }
