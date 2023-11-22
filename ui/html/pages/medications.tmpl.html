@@ -1,14 +1,14 @@
 {{define "title"}}Medications{{end}}
 
 {{define "main"}}
-<h1 class="mb-4">Медикаменти</h1>
+<h1 class="mb-4">Medications</h1>
 <form class="row align-items-center mb-3" action="/medications/" method="POST" novalidate>
     <div class="col-5">
         <div class="input-group has-validation">
             <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
                 <input type="text" name="name" id="name"
-                    class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}" placeholder="Нов медикамент">
-                <label for="name">Нов медикамент</label>
+                    class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}" placeholder="New Medication">
+                <label for="name">New Medication</label>
             </div>
             {{with .Form.FieldErrors.name}}
             <div class="invalid-feedback">{{.}}</div>
@@ -16,7 +16,7 @@
         </div>
     </div>
     <div class="col {{if.Form.FieldErrors.name}}mb-4{{end}}">
-        <input type="submit" class="btn btn-outline-success btn-lg" value="Добави">
+        <input type="submit" class="btn btn-outline-success btn-lg" value="Add">
     </div>
     </div>
 </form>
@@ -27,7 +27,7 @@
             href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
             <form action="/medications/delete" method="POST">
                 <input type="hidden" name="name" value="{{.Name}}">
-                <input type="submit" class="btn btn-danger" value="Изтрий">
+                <input type="submit" class="btn btn-danger" value="Delete">
             </form>
         </a>
     {{end}}

@@ -1,20 +1,20 @@
 {{define "title"}}All Patients{{end}}
 
 {{define "main"}}
-    <h1 class="mb-4">Всички Пациенти</h1>
+    <h1 class="mb-4">All Patients</h1>
     {{if .Patients}}
         <div class="table-responsive">
             <table class="table table-striped align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">ЕГН</th>
-                        <th scope="col">Имена</th>
-                        <th scope="col">Номер</th>
-                        <th scope="col">Ръст</th>
-                        <th scope="col">Тегло</th>
-                        <th scope="col">Медикамент</th>
-                        <th scope="col">Одобрен</th>
-                        <th scope="col">ПП</th>
+                        <th scope="col">UCN</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Height</th>
+                        <th scope="col">Weight</th>
+                        <th scope="col">Medication</th>
+                        <th scope="col">Approved</th>
+                        <th scope="col">FC</th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -32,7 +32,7 @@
                         <td scope="col">
                             <form action="/patients/delete" method="POST">
                                 <input type="hidden" name="id" value="{{.ID}}">
-                                <input type="submit" class="btn btn-danger" value="Изтрий">
+                                <input type="submit" class="btn btn-danger" value="Delete">
                             </form>
                         </td>
                     </tr>
@@ -41,6 +41,6 @@
             </table>
         </div>
     {{else}}
-        <p>В момента няма пациенти, добави нов от <a href="/patients/create">тук</a></p>
+        <p>Currently there are no patients. You can add a new one <a href="/patients/create">here</a></p>
     {{end}}
 {{end}}

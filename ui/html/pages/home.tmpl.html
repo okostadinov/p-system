@@ -1,15 +1,15 @@
 {{define "title"}}Home{{end}}
 
 {{define "main"}}
-    <h1 class="mb-4">Последно добавени пациенти</h1>
+    <h1 class="mb-4">Latest Patients</h1>
     {{if .Patients}}
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
                     <tr>
-                        <th scope="col">Име</th>
-                        <th scope="col">Номер</th>
-                        <th scope="col">Медикамент</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Medication</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -24,6 +24,6 @@
             </table>
         </div>
     {{else}}
-        <p>В момента няма пациенти, добави нов от <a href="/patients/create">тук</a></p>
+        <p>Currently there are no patients, you can create a new one <a href="/patients/create">here</a></p>
     {{end}}
 {{end}}

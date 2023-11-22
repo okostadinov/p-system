@@ -111,7 +111,7 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 	case "eqfield":
 		return fmt.Sprintf("field does not equal %s", param)
 	default:
-		return "different error"
+		return "undefined error"
 	}
 }
 

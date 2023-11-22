@@ -116,7 +116,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = app.setFlash(w, r, "Пациентът бе добавен успешно")
+	err = app.setFlash(w, r, "Patient successfully added!")
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -223,7 +223,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Данните бяха обновени успешно")
+	app.setFlash(w, r, "Patient successfully updated!")
 	http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
 }
 
@@ -240,7 +240,7 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Пациентът бе изтрит успешно")
+	app.setFlash(w, r, "Patient successfully deleted!")
 	http.Redirect(w, r, "/patients/", http.StatusSeeOther)
 }
 
@@ -255,7 +255,7 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
-			app.setFlash(w, r, "Не съществува пациент с такъв ЕГН")
+			app.setFlash(w, r, "No such patient with this UCN")
 			http.Redirect(w, r, r.Header.Get("Referer"), http.StatusSeeOther)
 		} else {
 			app.serverError(w, err)
@@ -308,7 +308,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.setFlash(w, r, "Медикаментът бе добавен успешно")
+	app.setFlash(w, r, "Medicationът successfully added!")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
@@ -322,7 +322,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(patients) > 0 {
-		app.setFlash(w, r, "Медикаментът не може да бъде изтрит, поради записани с него пациенти")
+		app.setFlash(w, r, "Medication cannot be deleted due to registed patients.")
 		http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 		return
 	}
@@ -333,7 +333,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	app.setFlash(w, r, "Медикаментът бе изтрит успешно")
+	app.setFlash(w, r, "Medication successfully deleted!")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
 
