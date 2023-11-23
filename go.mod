@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/schema v1.2.1
 	github.com/gorilla/sessions v1.2.2
 	github.com/justinas/alice v1.2.0
-	github.com/srinathgs/mysqlstore v0.0.0-20200417050510-9cbb9420fc4c
+	github.com/srinathgs/mysqlstore v0.0.0-20231123182912-ffbca72c0a70
 	golang.org/x/crypto v0.7.0
 )
 

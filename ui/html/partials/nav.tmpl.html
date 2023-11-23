@@ -10,6 +10,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
+                {{if .IsAuthenticated}}
                 <li class="nav-item">
                     <a class="nav-link" href="/patients/create">New patient</a>
                 </li>
@@ -19,23 +20,29 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/medications/">Medications</a>
                 </li>
+                {{end}}
             </ul>
+            {{if .IsAuthenticated}}
             <form class="d-flex mx-auto" action="/patients/search" method="POST" novalidate>
                 <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="UCN">
                 <input type="submit" class="btn btn-outline-secondary" value="Search">
             </form>
-            <ul class="navbar-nav mb-2 mb-lg-0">
+            {{end}}
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {{if not .IsAuthenticated}}
                 <li class="nav-item">
                     <a href="/users/signup" class="nav-link">Signup</a>
                 </li>
                 <li class="nav-item">
                     <a href="/users/login" class="nav-link">Login</a>
                 </li>
+                {{else}}
                 <li class="nav-item">
                     <form action="/users/logout" method="POST">
                         <input type="submit" class="nav-link" value="Logout">
                     </form>
                 </li>
+                {{end}}
             </ul>
         </div>
     </div>

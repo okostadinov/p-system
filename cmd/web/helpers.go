@@ -61,8 +61,9 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 // prepares a template data struct with common dynamic data
 func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) *templateData {
 	return &templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.popFlash(w, r),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.popFlash(w, r),
+		IsAuthenticated: app.isAuthenticated(w, r),
 	}
 }
 
@@ -79,6 +80,44 @@ func (app *application) decodeForm(r *http.Request, form interface{}) error {
 	}
 
 	return nil
+}
+
+// adds a flash message to the current session
+func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content string, flashType string) error {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return err
+	}
+
+	flash := Flash{Content: content, Type: flashType}
+	session.AddFlash(flash)
+	err = session.Save(r, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// pops the flash message from the current session and returns it
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
+	flash := &Flash{}
+
+	session, _ := app.store.Get(r, "session")
+
+	if flashes := session.Flashes(); len(flashes) > 0 {
+		flash = flashes[0].(*Flash)
+	}
+
+	session.Save(r, w)
+
+	return *flash
+}
+
+func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
+	session, _ := app.store.Get(r, "session")
+	_, ok := session.Values["authenticatedUserID"]
+	return ok
 }
 
 // parses the form and returns whether the validation was successful or not, together with the a map of errors
@@ -120,38 +159,6 @@ func (app *application) fetchTagErrorMessage(tag, param string) string {
 	default:
 		return "undefined error"
 	}
-}
-
-// adds a flash message to the current session
-func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content string, flashType string) error {
-	session, err := app.store.Get(r, "session")
-	if err != nil {
-		return err
-	}
-
-	flash := Flash{Content: content, Type: flashType}
-	session.AddFlash(flash)
-	err = session.Save(r, w)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// pops the flash message from the current session and returns it
-func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
-	flash := &Flash{}
-
-	session, _ := app.store.Get(r, "session")
-
-	if flashes := session.Flashes(); len(flashes) > 0 {
-		flash = flashes[0].(*Flash)
-	}
-
-	session.Save(r, w)
-
-	return *flash
 }
 
 // validates whether a string is at least 8 characters long and includes both letters and numbers

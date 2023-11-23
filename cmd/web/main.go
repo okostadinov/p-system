@@ -126,6 +126,7 @@ func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
 		MaxAge:   864000,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
 	}
 
 	store.Cleanup(0)

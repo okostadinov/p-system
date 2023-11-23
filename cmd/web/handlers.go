@@ -11,12 +11,13 @@ import (
 )
 
 type templateData struct {
-	CurrentYear int
-	Patient     *models.Patient
-	Patients    []*models.Patient
-	Medications []*models.Medication
-	Form        any
-	Flash       Flash
+	CurrentYear     int
+	Patient         *models.Patient
+	Patients        []*models.Patient
+	Medications     []*models.Medication
+	Form            any
+	Flash           Flash
+	IsAuthenticated bool
 }
 
 type patientCreateForm struct {
