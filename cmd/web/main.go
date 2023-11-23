@@ -63,7 +63,7 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	registerFlashType()
+	registerFlashStruct()
 
 	app := &application{
 		infoLog:       infoLog,
@@ -132,6 +132,6 @@ func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
 	return store, nil
 }
 
-func registerFlashType() {
+func registerFlashStruct() {
 	gob.Register(&Flash{})
 }

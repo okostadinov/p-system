@@ -447,17 +447,12 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := app.store.Get(r, "logged")
+	session, err := app.store.Get(r, "session")
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
 	session.Values["authenticatedUserID"] = id
-	err = session.Save(r, w)
-	if err != nil {
-		app.serverError(w, err)
-		return
-	}
 
 	err = app.setFlash(w, r, "Logged in successfully!", "success")
 	if err != nil {
@@ -467,4 +462,19 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
-func (app *application) userLogout(w http.ResponseWriter, r *http.Request) {}
+func (app *application) userLogout(w http.ResponseWriter, r *http.Request) {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+	delete(session.Values, "authenticatedUserID")
+
+	err = app.setFlash(w, r, "Logged out successfully!", "success")
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}

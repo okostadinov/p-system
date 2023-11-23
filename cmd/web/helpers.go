@@ -12,8 +12,8 @@ import (
 )
 
 type Flash struct {
-	Content   string
-	FlashType string
+	Content string
+	Type    string
 }
 
 type FieldErrors map[string]string
@@ -129,7 +129,7 @@ func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content
 		return err
 	}
 
-	flash := Flash{Content: content, FlashType: flashType}
+	flash := Flash{Content: content, Type: flashType}
 	session.AddFlash(flash)
 	err = session.Save(r, w)
 	if err != nil {
