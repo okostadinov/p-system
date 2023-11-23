@@ -51,24 +51,17 @@ func main() {
 
 	defer db.Close()
 
+	store, err := setupStore(db, *storeKey)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer store.Close()
+
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-
-	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(*storeKey))
-	if err != nil {
-		errorLog.Fatal(err)
-	}
-
-	store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   864000 * 7,
-		HttpOnly: true,
-		Secure:   true,
-	}
-
-	defer store.Close()
 
 	registerFlashType()
 
@@ -120,6 +113,23 @@ func setupValidator() *validator.Validate {
 
 	validate.RegisterValidation("password", passwordValidate)
 	return validate
+}
+
+func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
+	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(key))
+	if err != nil {
+		return nil, err
+	}
+
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   864000,
+		HttpOnly: true,
+		Secure:   true,
+	}
+
+	store.Cleanup(0)
+	return store, nil
 }
 
 func registerFlashType() {
