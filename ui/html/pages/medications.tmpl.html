@@ -23,13 +23,13 @@
 {{if .Medications}}
 <ul class="list-group list-group-flush" style="max-width: 500px;">
     {{range .Medications}}
-        <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
-            href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
-            <form action="/medications/delete" method="POST">
-                <input type="hidden" name="name" value="{{.Name}}">
-                <input type="submit" class="btn btn-danger" value="Delete">
-            </form>
-        </a>
+    <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
+        href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
+        <form action="/medications/delete" method="POST">
+            <input type="hidden" name="name" value="{{.Name}}">
+            <input type="submit" class="btn btn-danger" value="Delete">
+        </form>
+    </a>
     {{end}}
 </ul>
 {{end}}

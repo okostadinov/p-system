@@ -22,8 +22,8 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FieldErrors.first_name}}is-invalid{{end}}">
                     <input name="first_name" id="first_name" type="text"
-                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}" placeholder="First name"
-                        value="{{.Patient.FirstName}}">
+                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}"
+                        placeholder="First name" value="{{.Patient.FirstName}}">
                     <label for="first_name">First name</label>
                 </div>
                 {{with .Form.FieldErrors.first_name}}
@@ -50,8 +50,8 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}">
                     <input name="phone_number" id="phone_number" type="text"
-                        class="form-control {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}" placeholder="Phone number"
-                        value="{{.Patient.PhoneNumber}}">
+                        class="form-control {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}"
+                        placeholder="Phone number" value="{{.Patient.PhoneNumber}}">
                     <label for="phone_number">Phone number</label>
                 </div>
                 {{with .Form.FieldErrors.phone_number}}

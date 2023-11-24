@@ -1,46 +1,48 @@
 {{define "title"}}All Patients{{end}}
 
 {{define "main"}}
-    <h1 class="mb-4">All Patients</h1>
-    {{if .Patients}}
-        <div class="table-responsive">
-            <table class="table table-striped align-middle">
-                <thead>
-                    <tr>
-                        <th scope="col">UCN</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Phone Number</th>
-                        <th scope="col">Height</th>
-                        <th scope="col">Weight</th>
-                        <th scope="col">Medication</th>
-                        <th scope="col">Approved</th>
-                        <th scope="col">FC</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{range .Patients}}
-                    <tr>
-                        <td scope="col">{{.UCN}}</td>
-                        <td scope="col"><a href="/patients/{{.ID}}">{{.FirstName}} {{.LastName}}</a></td>
-                        <td scope="col"><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
-                        <td scope="col">{{.Height}}</td>
-                        <td scope="col">{{.Weight}}</td>
-                        <td scope="col"><a href="/patients/medication/{{.Medication}}">{{.Medication}}</a></td>
-                        <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if .Approved}}checked{{end}}></td>
-                        <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if .FirstContinuation}}checked{{end}}></td>
-                        <td scope="col">
-                            <form action="/patients/delete" method="POST">
-                                <input type="hidden" name="id" value="{{.ID}}">
-                                <input type="submit" class="btn btn-danger" value="Delete">
-                            </form>
-                        </td>
-                    </tr>
-                    {{end}}
-                </tbody>
-            </table>
-        </div>
-    {{else}}
-        <p>Currently there are no patients. You can add a new one <a href="/patients/create">here</a></p>
-    {{end}}
+<h1 class="mb-4">All Patients</h1>
+{{if .Patients}}
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th scope="col">UCN</th>
+                <th scope="col">Name</th>
+                <th scope="col">Phone Number</th>
+                <th scope="col">Height</th>
+                <th scope="col">Weight</th>
+                <th scope="col">Medication</th>
+                <th scope="col">Approved</th>
+                <th scope="col">FC</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .Patients}}
+            <tr>
+                <td scope="col">{{.UCN}}</td>
+                <td scope="col"><a href="/patients/{{.ID}}">{{.FirstName}} {{.LastName}}</a></td>
+                <td scope="col"><a href="tel:0{{.PhoneNumber}}">{{.PhoneNumber}}</a></td>
+                <td scope="col">{{.Height}}</td>
+                <td scope="col">{{.Weight}}</td>
+                <td scope="col"><a href="/patients/medication/{{.Medication}}">{{.Medication}}</a></td>
+                <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if .Approved}}checked{{end}}>
+                </td>
+                <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if
+                        .FirstContinuation}}checked{{end}}></td>
+                <td scope="col">
+                    <form action="/patients/delete" method="POST">
+                        <input type="hidden" name="id" value="{{.ID}}">
+                        <input type="submit" class="btn btn-danger" value="Delete">
+                    </form>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+{{else}}
+<p>Currently there are no patients. You can add a new one <a href="/patients/create">here</a></p>
+{{end}}
 {{end}}

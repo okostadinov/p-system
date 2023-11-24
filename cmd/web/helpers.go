@@ -107,16 +107,15 @@ func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
 
 	if flashes := session.Flashes(); len(flashes) > 0 {
 		flash = flashes[0].(*Flash)
+		session.Save(r, w)
 	}
-
-	session.Save(r, w)
 
 	return *flash
 }
 
 func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 	session, _ := app.store.Get(r, "session")
-	_, ok := session.Values["authenticatedUserID"]
+	_, ok := session.Values["userID"]
 	return ok
 }
 

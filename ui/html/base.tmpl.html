@@ -17,7 +17,7 @@
     <header class="p-3 mb-3 border-bottom">
         {{template "nav" .}}
     </header>
-    <main class="container">
+    <main class="container mb-5">
         {{if .Flash.Content}}
         <div class="alert alert-{{.Flash.Type}}" role="alert">{{.Flash.Content}}</div>
         {{end}}

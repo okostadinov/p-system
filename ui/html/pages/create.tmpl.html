@@ -22,8 +22,8 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FieldErrors.first_name}}is-invalid{{end}}">
                     <input name="first_name" id="first_name" type="text"
-                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}" placeholder="First name"
-                        value="{{.Form.FirstName}}">
+                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}"
+                        placeholder="First name" value="{{.Form.FirstName}}">
                     <label for="first_name">First name</label>
                 </div>
                 {{with .Form.FieldErrors.first_name}}
