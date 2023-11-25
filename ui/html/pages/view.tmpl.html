@@ -4,6 +4,7 @@
 {{if .Patient}}
 <h1 class="mb-4">Patient Details</h1>
 <form action="/patients/{{.Patient.ID}}" method="POST" novalidate>
+    {{.CSRFField}}
     <div class="row mb-3">
         <div class="col-3">
             <div class="input-group has-validation">

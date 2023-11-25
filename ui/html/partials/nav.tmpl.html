@@ -24,6 +24,7 @@
             </ul>
             {{if .IsAuthenticated}}
             <form class="d-flex mx-auto" action="/patients/search" method="POST" novalidate>
+                {{.CSRFField}}
                 <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="UCN">
                 <input type="submit" class="btn btn-outline-secondary" value="Search">
             </form>
@@ -39,6 +40,7 @@
                 {{else}}
                 <li class="nav-item">
                     <form action="/users/logout" method="POST">
+                        {{.CSRFField}}
                         <input type="submit" class="nav-link" value="Logout">
                     </form>
                 </li>

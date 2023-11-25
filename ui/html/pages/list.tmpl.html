@@ -19,6 +19,7 @@
             </tr>
         </thead>
         <tbody>
+            {{$csrf := .CSRFField}}
             {{range .Patients}}
             <tr>
                 <td scope="col">{{.UCN}}</td>
@@ -33,6 +34,7 @@
                         .FirstContinuation}}checked{{end}}></td>
                 <td scope="col">
                     <form action="/patients/delete" method="POST">
+                        {{$csrf}}
                         <input type="hidden" name="id" value="{{.ID}}">
                         <input type="submit" class="btn btn-danger" value="Delete">
                     </form>

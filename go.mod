@@ -8,6 +8,7 @@ require github.com/gorilla/mux v1.8.1
 
 require (
 	github.com/go-playground/validator/v10 v10.16.0
+	github.com/gorilla/csrf v1.7.2
 	github.com/gorilla/schema v1.2.1
 	github.com/gorilla/sessions v1.2.2
 	github.com/srinathgs/mysqlstore v0.0.0-20231123182912-ffbca72c0a70

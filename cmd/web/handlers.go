@@ -10,16 +10,6 @@ import (
 	"p-system.okostadinov.net/internal/models"
 )
 
-type templateData struct {
-	CurrentYear     int
-	Patient         *models.Patient
-	Patients        []*models.Patient
-	Medications     []*models.Medication
-	Form            any
-	Flash           Flash
-	IsAuthenticated bool
-}
-
 type patientCreateForm struct {
 	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
 	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`

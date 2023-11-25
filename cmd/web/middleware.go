@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/csrf"
 )
 
 func secureHeaders(next http.Handler) http.Handler {
@@ -49,4 +51,12 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func csrfProtect(key string) func(http.Handler) http.Handler {
+	return csrf.Protect(
+		[]byte(key),
+		csrf.Path("/"),
+		csrf.SameSite(csrf.SameSiteLaxMode),
+	)
 }

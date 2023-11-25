@@ -2,7 +2,9 @@
 
 {{define "main"}}
 <h1 class="mb-4">Medications</h1>
+{{$csrf := .CSRFField}}
 <form class="row align-items-center mb-3" action="/medications/" method="POST" novalidate>
+    {{$csrf}}
     <div class="col-5">
         <div class="input-group has-validation">
             <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
@@ -26,6 +28,7 @@
     <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
         href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
         <form action="/medications/delete" method="POST">
+            {{$csrf}}
             <input type="hidden" name="name" value="{{.Name}}">
             <input type="submit" class="btn btn-danger" value="Delete">
         </form>

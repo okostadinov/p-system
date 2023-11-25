@@ -3,6 +3,7 @@
 {{define "main"}}
 <h1 class="mb-4">Signup</h1>
 <form action="/users/signup" style="max-width: 500px;" method="POST" novalidate>
+    {{.CSRFField}}
     <div class="input-group has-validation mb-3">
         <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
             <input name="name" id="name" type="text" class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}"

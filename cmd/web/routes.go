@@ -7,13 +7,13 @@ import (
 )
 
 // registers the routes to a mux assigned to the server
-func (app *application) routes() http.Handler {
+func (app *application) routes(csrfKey string) http.Handler {
 	mux := mux.NewRouter()
 
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
-	mux.Use(app.recoverPanic, app.logRequest, secureHeaders)
+	mux.Use(app.recoverPanic, app.logRequest, secureHeaders, csrfProtect(csrfKey))
 
 	mux.HandleFunc("/", app.home).Methods("GET")
 

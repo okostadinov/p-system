@@ -4,6 +4,7 @@
 <h1 class="mb-4">New Patient</h1>
 {{if .Medications}}
 <form action="/patients/create" method="POST" novalidate>
+    {{.CSRFField}}
     <div class="row mb-3">
         <div class="col-3">
             <div class="input-group has-validation">

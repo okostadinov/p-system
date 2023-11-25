@@ -39,6 +39,7 @@ func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
 	storeKey := flag.String("storekey", "secretkey", "MySQL session store key")
+	csrfKey := flag.String("csrfkey", "another-secret-key", "CSRF auth key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -72,7 +73,7 @@ func main() {
 		patients:      &models.PatientModel{DB: db},
 		users:         &models.UserModel{DB: db},
 		templateCache: templateCache,
-		decoder:       schema.NewDecoder(),
+		decoder:       setupDecoder(),
 		validator:     setupValidator(),
 		store:         store,
 	}
@@ -84,7 +85,7 @@ func main() {
 	srv := &http.Server{
 		Addr:         *addr,
 		ErrorLog:     errorLog,
-		Handler:      app.routes(),
+		Handler:      app.routes(*csrfKey),
 		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
@@ -113,6 +114,12 @@ func setupValidator() *validator.Validate {
 
 	validate.RegisterValidation("password", passwordValidate)
 	return validate
+}
+
+func setupDecoder() *schema.Decoder {
+	decoder := schema.NewDecoder()
+	decoder.IgnoreUnknownKeys(true)
+	return decoder
 }
 
 func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {

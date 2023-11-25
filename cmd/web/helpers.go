@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/csrf"
 )
 
 type Flash struct {
@@ -64,6 +65,7 @@ func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) 
 		CurrentYear:     time.Now().Year(),
 		Flash:           app.popFlash(w, r),
 		IsAuthenticated: app.isAuthenticated(w, r),
+		CSRFField:       csrf.TemplateField(r),
 	}
 }
 

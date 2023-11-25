@@ -3,7 +3,20 @@ package main
 import (
 	"html/template"
 	"path/filepath"
+
+	"p-system.okostadinov.net/internal/models"
 )
+
+type templateData struct {
+	CurrentYear     int
+	Patient         *models.Patient
+	Patients        []*models.Patient
+	Medications     []*models.Medication
+	Form            any
+	Flash           Flash
+	IsAuthenticated bool
+	CSRFField       template.HTML
+}
 
 // prepares and stores all the html templates upon app initiation
 func newTemplateCache() (map[string]*template.Template, error) {
