@@ -37,7 +37,7 @@ var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
+	dsn := flag.String("dsn", "p_system_admin:p_system_admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
 	storeKey := flag.String("storekey", "secretkey", "MySQL session store key")
 	csrfKey := flag.String("csrfkey", "another-secret-key", "CSRF auth key")
 	flag.Parse()
