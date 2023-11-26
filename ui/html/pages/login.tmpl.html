@@ -1,0 +1,30 @@
+{{define "title"}}Login{{end}}
+
+{{define "main"}}
+<h1 class="mb-4">Login</h1>
+<form action="/users/login" method="POST" style="max-width: 500px;" novalidate>
+    {{.CSRFField}}
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.email}}is-invalid{{end}}">
+            <input name="email" id="email" type="email"
+                class="form-control {{if .Form.FieldErrors.email}}is-invalid{{end}}" placeholder="Email"
+                value="{{.Form.Email}}">
+            <label for="email">Email</label>
+        </div>
+        {{with .Form.FieldErrors.email}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <div class="input-group has-validation mb-3">
+        <div class="form-floating {{if .Form.FieldErrors.password}}is-invalid{{end}}">
+            <input name="password" id="password" type="password"
+                class="form-control {{if .Form.FieldErrors.password}}is-invalid{{end}}" placeholder="Password">
+            <label for="password">Password</label>
+        </div>
+        {{with .Form.FieldErrors.password}}
+        <div class="invalid-feedback">{{.}}</div>
+        {{end}}
+    </div>
+    <input type="submit" class="btn btn-success btn-lg" value="Login">
+</form>
+{{end}}

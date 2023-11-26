@@ -1,28 +1,51 @@
 {{define "nav"}}
 <nav class="navbar navbar-expand-md">
     <div class="container-fluid">
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Начало</a>
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                {{if .IsAuthenticated}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/patients/create">New patient</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/patients/create">Нов пациент</a>
+                    <a class="nav-link" href="/patients/">All patients</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/patients/">Всички пациенти</a>
+                    <a class="nav-link" href="/medications/">Medications</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/medications/">Медикаменти</a>
-                </li>
+                {{end}}
             </ul>
-            <form class="d-flex" action="/patients/search" method="POST" novalidate>
-                <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="ЕГН">
-                <input type="submit" class="btn btn-outline-secondary" value="Търси">
+            {{if .IsAuthenticated}}
+            <form class="d-flex mx-auto" action="/patients/search" method="POST" novalidate>
+                {{.CSRFField}}
+                <input type="search" name="q" id="ucn" class="form-control me-2" placeholder="UCN">
+                <input type="submit" class="btn btn-outline-secondary" value="Search">
             </form>
+            {{end}}
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                {{if not .IsAuthenticated}}
+                <li class="nav-item">
+                    <a href="/users/signup" class="nav-link">Signup</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/users/login" class="nav-link">Login</a>
+                </li>
+                {{else}}
+                <li class="nav-item">
+                    <form action="/users/logout" method="POST">
+                        {{.CSRFField}}
+                        <input type="submit" class="nav-link" value="Logout">
+                    </form>
+                </li>
+                {{end}}
+            </ul>
         </div>
     </div>
 </nav>

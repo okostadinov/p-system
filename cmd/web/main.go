@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"database/sql"
+	"encoding/gob"
 	"flag"
 	"html/template"
 	"log"
@@ -25,6 +26,7 @@ type application struct {
 	errorLog      *log.Logger
 	medications   *models.MedicationModel
 	patients      *models.PatientModel
+	users         *models.UserModel
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
 	validator     *validator.Validate
@@ -35,8 +37,9 @@ var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
+	dsn := flag.String("dsn", "p_system_admin:p_system_admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
 	storeKey := flag.String("storekey", "secretkey", "MySQL session store key")
+	csrfKey := flag.String("csrfkey", "another-secret-key", "CSRF auth key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -49,32 +52,28 @@ func main() {
 
 	defer db.Close()
 
+	store, err := setupStore(db, *storeKey)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
+	defer store.Close()
+
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(*storeKey))
-	if err != nil {
-		errorLog.Fatal(err)
-	}
-
-	store.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   864000 * 7,
-		HttpOnly: true,
-		Secure:   true,
-	}
-
-	defer store.Close()
+	registerFlashStruct()
 
 	app := &application{
 		infoLog:       infoLog,
 		errorLog:      errorLog,
 		medications:   &models.MedicationModel{DB: db},
 		patients:      &models.PatientModel{DB: db},
+		users:         &models.UserModel{DB: db},
 		templateCache: templateCache,
-		decoder:       schema.NewDecoder(),
+		decoder:       setupDecoder(),
 		validator:     setupValidator(),
 		store:         store,
 	}
@@ -86,7 +85,7 @@ func main() {
 	srv := &http.Server{
 		Addr:         *addr,
 		ErrorLog:     errorLog,
-		Handler:      app.routes(),
+		Handler:      app.routes(*csrfKey),
 		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
@@ -113,5 +112,34 @@ func setupValidator() *validator.Validate {
 		return field.Tag.Get("schema")
 	})
 
+	validate.RegisterValidation("password", passwordValidate)
 	return validate
+}
+
+func setupDecoder() *schema.Decoder {
+	decoder := schema.NewDecoder()
+	decoder.IgnoreUnknownKeys(true)
+	return decoder
+}
+
+func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
+	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(key))
+	if err != nil {
+		return nil, err
+	}
+
+	store.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   864000,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	store.Cleanup(0)
+	return store, nil
+}
+
+func registerFlashStruct() {
+	gob.Register(&Flash{})
 }

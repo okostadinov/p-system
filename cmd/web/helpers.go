@@ -6,9 +6,16 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
+	"unicode"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/csrf"
 )
+
+type Flash struct {
+	Content string
+	Type    string
+}
 
 type FieldErrors map[string]string
 
@@ -55,8 +62,10 @@ func (app *application) render(w http.ResponseWriter, status int, page string, d
 // prepares a template data struct with common dynamic data
 func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) *templateData {
 	return &templateData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.popFlash(w, r),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.popFlash(w, r),
+		IsAuthenticated: app.isAuthenticated(w, r),
+		CSRFField:       csrf.TemplateField(r),
 	}
 }
 
@@ -73,6 +82,43 @@ func (app *application) decodeForm(r *http.Request, form interface{}) error {
 	}
 
 	return nil
+}
+
+// adds a flash message to the current session
+func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content string, flashType string) error {
+	session, err := app.store.Get(r, "session")
+	if err != nil {
+		return err
+	}
+
+	flash := Flash{Content: content, Type: flashType}
+	session.AddFlash(flash)
+	err = session.Save(r, w)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// pops the flash message from the current session and returns it
+func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
+	flash := &Flash{}
+
+	session, _ := app.store.Get(r, "session")
+
+	if flashes := session.Flashes(); len(flashes) > 0 {
+		flash = flashes[0].(*Flash)
+		session.Save(r, w)
+	}
+
+	return *flash
+}
+
+func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
+	session, _ := app.store.Get(r, "session")
+	_, ok := session.Values["userID"]
+	return ok
 }
 
 // parses the form and returns whether the validation was successful or not, together with the a map of errors
@@ -96,52 +142,47 @@ func (app *application) validateForm(form interface{}) (bool, FieldErrors) {
 func (app *application) fetchTagErrorMessage(tag, param string) string {
 	switch tag {
 	case "required":
-		return "задължително поле"
+		return "required field"
 	case "numeric":
-		return "грешен формат (допустими стойности - цифри)"
+		return "invalid format (only numbers allowed)"
 	case "len":
-		return fmt.Sprintf("невалидно количество символи (нужни - %v)", param)
+		return fmt.Sprintf("invalid amount (requires %v)", param)
 	case "alphaunicode":
-		return "грешен формат (допустими стойности - букви)"
+		return "invalid format (only letters allowed)"
 	case "e164":
-		return "грешен формат номер (пр. +359123456789)"
+		return "invalid format (e.g. +359123456789)"
+	case "password":
+		return "invalid format (requires minimum 8 characters, including letters and numbers)"
+	case "eqfield":
+		return fmt.Sprintf("field does not equal %s", param)
+	case "email":
+		return "invalid format (e.g. email@example.com)"
 	default:
-		return ""
+		return "undefined error"
 	}
 }
 
-// adds a flash message to the current session
-func (app *application) setFlash(w http.ResponseWriter, r *http.Request, msg string) error {
-	session, err := app.store.Get(r, "session")
-	if err != nil {
-		return err
+// validates whether a string is at least 8 characters long and includes both letters and numbers
+func passwordValidate(fl validator.FieldLevel) bool {
+	var (
+		hasLetters = false
+		hasNumbers = false
+	)
+
+	password := fl.Field().String()
+
+	if len(password) < 8 {
+		return false
 	}
 
-	session.AddFlash(msg, "message")
-	err = session.Save(r, w)
-	if err != nil {
-		return err
+	for _, c := range password {
+		switch {
+		case unicode.IsLetter(c):
+			hasLetters = true
+		case unicode.IsNumber(c):
+			hasNumbers = true
+		}
 	}
 
-	return nil
-}
-
-// pops the flash message from the current session and returns it
-func (app *application) popFlash(w http.ResponseWriter, r *http.Request) string {
-	session, err := app.store.Get(r, "session")
-	if err != nil {
-		return ""
-	}
-
-	var flashMsg string
-	if flashes := session.Flashes("message"); len(flashes) > 0 {
-		flashMsg = flashes[0].(string)
-	}
-
-	err = session.Save(r, w)
-	if err != nil {
-		return ""
-	}
-
-	return flashMsg
+	return hasLetters && hasNumbers
 }
