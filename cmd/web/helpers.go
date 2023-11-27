@@ -6,9 +6,7 @@ import (
 	"net/http"
 	"runtime/debug"
 	"time"
-	"unicode"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/csrf"
 )
 
@@ -16,8 +14,6 @@ type Flash struct {
 	Content string
 	Type    string
 }
-
-type FieldErrors map[string]string
 
 // outputs the error to the client, as well as logging it locally for debugging
 func (app *application) serverError(w http.ResponseWriter, err error) {
@@ -115,74 +111,9 @@ func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
 	return *flash
 }
 
+// checks whether a user is logged based on the current session
 func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 	session, _ := app.store.Get(r, "session")
 	_, ok := session.Values["userID"]
 	return ok
-}
-
-// parses the form and returns whether the validation was successful or not, together with the a map of errors
-func (app *application) validateForm(form interface{}) (bool, FieldErrors) {
-	err := app.validator.Struct(form)
-
-	if err != nil {
-		errors := make(FieldErrors)
-
-		for _, err := range err.(validator.ValidationErrors) {
-			errors[err.Field()] = app.fetchTagErrorMessage(err.Tag(), err.Param())
-		}
-
-		return false, errors
-	}
-
-	return true, nil
-}
-
-// gets a translated form field error message based on the error
-func (app *application) fetchTagErrorMessage(tag, param string) string {
-	switch tag {
-	case "required":
-		return "required field"
-	case "numeric":
-		return "invalid format (only numbers allowed)"
-	case "len":
-		return fmt.Sprintf("invalid amount (requires %v)", param)
-	case "alphaunicode":
-		return "invalid format (only letters allowed)"
-	case "e164":
-		return "invalid format (e.g. +359123456789)"
-	case "password":
-		return "invalid format (requires minimum 8 characters, including letters and numbers)"
-	case "eqfield":
-		return fmt.Sprintf("field does not equal %s", param)
-	case "email":
-		return "invalid format (e.g. email@example.com)"
-	default:
-		return "undefined error"
-	}
-}
-
-// validates whether a string is at least 8 characters long and includes both letters and numbers
-func passwordValidate(fl validator.FieldLevel) bool {
-	var (
-		hasLetters = false
-		hasNumbers = false
-	)
-
-	password := fl.Field().String()
-
-	if len(password) < 8 {
-		return false
-	}
-
-	for _, c := range password {
-		switch {
-		case unicode.IsLetter(c):
-			hasLetters = true
-		case unicode.IsNumber(c):
-			hasNumbers = true
-		}
-	}
-
-	return hasLetters && hasNumbers
 }

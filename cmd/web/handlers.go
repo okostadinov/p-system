@@ -8,37 +8,38 @@ import (
 
 	"github.com/gorilla/mux"
 	"p-system.okostadinov.net/internal/models"
+	"p-system.okostadinov.net/internal/validator"
 )
 
 type patientCreateForm struct {
-	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName    string `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
-	Height      int    `schema:"height" validate:"required,numeric"`
-	Weight      int    `schema:"weight" validate:"required,numeric"`
-	Medication  string `schema:"medication" validate:"required"`
-	Note        string `schema:"note" validate:"required"`
-	FieldErrors `schema:"-"`
+	UCN                  string `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName            string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName             string `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber          string `schema:"phone_number" validate:"required,e164"`
+	Height               int    `schema:"height" validate:"required,numeric"`
+	Weight               int    `schema:"weight" validate:"required,numeric"`
+	Medication           string `schema:"medication" validate:"required"`
+	Note                 string `schema:"note" validate:"required"`
+	validator.FormErrors `schema:"-"`
 }
 
 type patientEditForm struct {
-	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName         string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName          string `schema:"last_name" validate:"required,alphaunicode"`
-	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
-	Height            int    `schema:"height" validate:"required,numeric"`
-	Weight            int    `schema:"weight" validate:"required,numeric"`
-	Medication        string `schema:"medication" validate:"required"`
-	Note              string `schema:"note" validate:"required"`
-	Approved          bool   `schema:"approved" validate:"boolean"`
-	FirstContinuation bool   `schema:"first_continuation" validate:"boolean"`
-	FieldErrors       `schema:"-"`
+	UCN                  string `schema:"ucn" validate:"required,numeric,len=10"`
+	FirstName            string `schema:"first_name" validate:"required,alphaunicode"`
+	LastName             string `schema:"last_name" validate:"required,alphaunicode"`
+	PhoneNumber          string `schema:"phone_number" validate:"required,e164"`
+	Height               int    `schema:"height" validate:"required,numeric"`
+	Weight               int    `schema:"weight" validate:"required,numeric"`
+	Medication           string `schema:"medication" validate:"required"`
+	Note                 string `schema:"note" validate:"required"`
+	Approved             bool   `schema:"approved" validate:"boolean"`
+	FirstContinuation    bool   `schema:"first_continuation" validate:"boolean"`
+	validator.FormErrors `schema:"-"`
 }
 
 type medicationAddForm struct {
-	Name        string `schema:"name" validate:"required"`
-	FieldErrors `schema:"-"`
+	Name                 string `schema:"name" validate:"required"`
+	validator.FormErrors `schema:"-"`
 }
 
 type searchByUCNForm struct {
@@ -46,17 +47,17 @@ type searchByUCNForm struct {
 }
 
 type userSignupForm struct {
-	Name            string `schema:"name" validate:"required"`
-	Email           string `schema:"email" validate:"required,email"`
-	Password        string `schema:"password" validate:"required,password"`
-	ConfirmPassword string `schema:"confirm_password" validate:"required,password,eqfield=Password"`
-	FieldErrors     `schema:"-"`
+	Name                 string `schema:"name" validate:"required"`
+	Email                string `schema:"email" validate:"required,email"`
+	Password             string `schema:"password" validate:"required,password"`
+	ConfirmPassword      string `schema:"confirm_password" validate:"required,password,eqfield=Password"`
+	validator.FormErrors `schema:"-"`
 }
 
 type userLoginForm struct {
-	Email       string `schema:"email" validate:"required,email"`
-	Password    string `schema:"password" validate:"required,password"`
-	FieldErrors `schema:"-"`
+	Email                string `schema:"email" validate:"required,email"`
+	Password             string `schema:"password" validate:"required,password"`
+	validator.FormErrors `schema:"-"`
 }
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +93,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	if ok, errors := app.validateForm(form); !ok {
+	if !app.validator.ValidateForm(form) {
 		medications, err := app.medications.GetAll()
 		if err != nil {
 			app.serverError(w, err)
@@ -101,7 +102,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 
 		data := app.newTemplateData(w, r)
 		data.Medications = medications
-		form.FieldErrors = errors
+		form.FormErrors = app.validator.FormErrors
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "create.tmpl.html", data)
 		return
@@ -191,7 +192,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok, errors := app.validateForm(form); !ok {
+	if !app.validator.ValidateForm(form) {
 		medications, err := app.medications.GetAll()
 		if err != nil {
 			app.serverError(w, err)
@@ -206,7 +207,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 
 		data := app.newTemplateData(w, r)
 		data.Medications = medications
-		form.FieldErrors = errors
+		form.FormErrors = app.validator.FormErrors
 		data.Form = form
 		data.Patient = patient
 		app.render(w, http.StatusUnprocessableEntity, "view.tmpl.html", data)
@@ -295,7 +296,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok, errors := app.validateForm(form); !ok {
+	if !app.validator.ValidateForm(form) {
 		medications, err := app.medications.GetAll()
 		if err != nil {
 			app.serverError(w, err)
@@ -303,7 +304,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := app.newTemplateData(w, r)
-		form.FieldErrors = errors
+		form.FormErrors = app.validator.FormErrors
 		data.Form = form
 		data.Medications = medications
 		app.render(w, http.StatusUnprocessableEntity, "medications.tmpl.html", data)
@@ -371,9 +372,9 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok, errors := app.validateForm(form); !ok {
+	if !app.validator.ValidateForm(form) {
 		data := app.newTemplateData(w, r)
-		form.FieldErrors = errors
+		form.FormErrors = app.validator.FormErrors
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
 		return
@@ -383,8 +384,8 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			data := app.newTemplateData(w, r)
-			form.FieldErrors = make(FieldErrors)
-			form.FieldErrors["email"] = "email address already in use"
+			app.validator.FormErrors["email"] = "email address already in use"
+			form.FormErrors = app.validator.FormErrors
 			data.Form = form
 			app.render(w, http.StatusUnprocessableEntity, "signup.tmpl.html", data)
 		} else {
@@ -415,9 +416,9 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if ok, errors := app.validateForm(form); !ok {
+	if !app.validator.ValidateForm(form) {
 		data := app.newTemplateData(w, r)
-		form.FieldErrors = errors
+		form.FormErrors = app.validator.FormErrors
 		data.Form = form
 		app.render(w, http.StatusUnprocessableEntity, "login.tmpl.html", data)
 		return

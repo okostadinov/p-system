@@ -53,6 +53,7 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 	})
 }
 
+// options setup for gorilla csrf middleware
 func csrfProtect(key string) func(http.Handler) http.Handler {
 	return csrf.Protect(
 		[]byte(key),

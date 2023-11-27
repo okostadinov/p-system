@@ -7,17 +7,17 @@
     {{$csrf}}
     <div class="col-5">
         <div class="input-group has-validation">
-            <div class="form-floating {{if .Form.FieldErrors.name}}is-invalid{{end}}">
+            <div class="form-floating {{if .Form.FormErrors.name}}is-invalid{{end}}">
                 <input type="text" name="name" id="name"
-                    class="form-control {{if .Form.FieldErrors.name}}is-invalid{{end}}" placeholder="New Medication">
+                    class="form-control {{if .Form.FormErrors.name}}is-invalid{{end}}" placeholder="New Medication">
                 <label for="name">New Medication</label>
             </div>
-            {{with .Form.FieldErrors.name}}
+            {{with .Form.FormErrors.name}}
             <div class="invalid-feedback">{{.}}</div>
             {{end}}
         </div>
     </div>
-    <div class="col {{if.Form.FieldErrors.name}}mb-4{{end}}">
+    <div class="col {{if.Form.FormErrors.name}}mb-4{{end}}">
         <input type="submit" class="btn btn-outline-success btn-lg" value="Add">
     </div>
     </div>

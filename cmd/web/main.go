@@ -9,16 +9,15 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"reflect"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/srinathgs/mysqlstore"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
 	"github.com/gorilla/sessions"
 	"p-system.okostadinov.net/internal/models"
+	"p-system.okostadinov.net/internal/validator"
 )
 
 type application struct {
@@ -29,11 +28,9 @@ type application struct {
 	users         *models.UserModel
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
-	validator     *validator.Validate
+	validator     *validator.Validator
 	store         *mysqlstore.MySQLStore
 }
-
-var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
@@ -52,7 +49,7 @@ func main() {
 
 	defer db.Close()
 
-	store, err := setupStore(db, *storeKey)
+	store, err := newStore(db, *storeKey)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
@@ -64,8 +61,6 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
-	registerFlashStruct()
-
 	app := &application{
 		infoLog:       infoLog,
 		errorLog:      errorLog,
@@ -73,8 +68,8 @@ func main() {
 		patients:      &models.PatientModel{DB: db},
 		users:         &models.UserModel{DB: db},
 		templateCache: templateCache,
-		decoder:       setupDecoder(),
-		validator:     setupValidator(),
+		decoder:       newDecoder(),
+		validator:     validator.NewValidator(),
 		store:         store,
 	}
 
@@ -95,34 +90,29 @@ func main() {
 	errorLog.Fatal(srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
 }
 
+// opens and tests the db connection pool before returning it
 func openDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return nil, err
 	}
+
 	if err = db.Ping(); err != nil {
 		return nil, err
 	}
+
 	return db, nil
 }
 
-func setupValidator() *validator.Validate {
-	validate = validator.New(validator.WithRequiredStructEnabled())
-	validate.RegisterTagNameFunc(func(field reflect.StructField) string {
-		return field.Tag.Get("schema")
-	})
-
-	validate.RegisterValidation("password", passwordValidate)
-	return validate
-}
-
-func setupDecoder() *schema.Decoder {
+// initiates a new form decoder which will ignore the csrf token input
+func newDecoder() *schema.Decoder {
 	decoder := schema.NewDecoder()
 	decoder.IgnoreUnknownKeys(true)
 	return decoder
 }
 
-func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
+// initiates a mysql session store with a default cleanup interval and registered Flash struct type
+func newStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
 	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(key))
 	if err != nil {
 		return nil, err
@@ -136,10 +126,8 @@ func setupStore(db *sql.DB, key string) (*mysqlstore.MySQLStore, error) {
 		SameSite: http.SameSiteLaxMode,
 	}
 
+	gob.Register(&Flash{})
+
 	store.Cleanup(0)
 	return store, nil
-}
-
-func registerFlashStruct() {
-	gob.Register(&Flash{})
 }
