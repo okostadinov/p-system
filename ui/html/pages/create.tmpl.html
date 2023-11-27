@@ -8,39 +8,39 @@
     <div class="row mb-3">
         <div class="col-3">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.ucn}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.ucn}}is-invalid{{end}}">
                     <input name="ucn" id="ucn" type="text"
-                        class="form-control {{if .Form.FieldErrors.ucn}}is-invalid{{end}}" placeholder="UCN"
+                        class="form-control {{if .Form.FormErrors.ucn}}is-invalid{{end}}" placeholder="UCN"
                         value="{{.Form.UCN}}">
                     <label for="ucn">UCN</label>
                 </div>
-                {{with .Form.FieldErrors.ucn}}
+                {{with .Form.FormErrors.ucn}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
         </div>
         <div class="col">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.first_name}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.first_name}}is-invalid{{end}}">
                     <input name="first_name" id="first_name" type="text"
-                        class="form-control {{if .Form.FieldErrors.first_name}}is-invalid{{end}}"
+                        class="form-control {{if .Form.FormErrors.first_name}}is-invalid{{end}}"
                         placeholder="First name" value="{{.Form.FirstName}}">
                     <label for="first_name">First name</label>
                 </div>
-                {{with .Form.FieldErrors.first_name}}
+                {{with .Form.FormErrors.first_name}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
         </div>
         <div class="col">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.last_name}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.last_name}}is-invalid{{end}}">
                     <input name="last_name" id="last_name" type="text"
-                        class="form-control {{if .Form.FieldErrors.last_name}}is-invalid{{end}}" placeholder="Last name"
+                        class="form-control {{if .Form.FormErrors.last_name}}is-invalid{{end}}" placeholder="Last name"
                         value="{{.Form.LastName}}">
                     <label for="last_name">Last name</label>
                 </div>
-                {{with .Form.FieldErrors.last_name}}
+                {{with .Form.FormErrors.last_name}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
@@ -49,39 +49,39 @@
     <div class="row mb-3">
         <div class="col">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.phone_number}}is-invalid{{end}}">
                     <input name="phone_number" id="phone_number" type="text" placeholder="Phone number"
-                        class="form-control {{if .Form.FieldErrors.phone_number}}is-invalid{{end}}"
+                        class="form-control {{if .Form.FormErrors.phone_number}}is-invalid{{end}}"
                         value="{{.Form.PhoneNumber}}">
                     <label for="phone_number">Phone number</label>
                 </div>
-                {{with .Form.FieldErrors.phone_number}}
+                {{with .Form.FormErrors.phone_number}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
         </div>
         <div class="col-2">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.height}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.height}}is-invalid{{end}}">
                     <input name="height" id="height" type="number"
-                        class="form-control {{if .Form.FieldErrors.height}}is-invalid{{end}}" placeholder="Height"
+                        class="form-control {{if .Form.FormErrors.height}}is-invalid{{end}}" placeholder="Height"
                         value="{{.Form.Height}}">
                     <label for="height">Height</label>
                 </div>
-                {{with .Form.FieldErrors.height}}
+                {{with .Form.FormErrors.height}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
         </div>
         <div class="col-2">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.weight}}is-invalid{{end}}">
+                <div class="form-floating {{if .Form.FormErrors.weight}}is-invalid{{end}}">
                     <input name="weight" id="weight" type="number"
-                        class="form-control {{if .Form.FieldErrors.weight}}is-invalid{{end}}" placeholder="Weight"
+                        class="form-control {{if .Form.FormErrors.weight}}is-invalid{{end}}" placeholder="Weight"
                         value="{{.Form.Weight}}">
                     <label for="weight">Weight</label>
                 </div>
-                {{with .Form.FieldErrors.weight}}
+                {{with .Form.FormErrors.weight}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>
@@ -101,12 +101,12 @@
     <div class="row mb-3">
         <div class="col">
             <div class="input-group has-validation">
-                <div class="form-floating {{if .Form.FieldErrors.note}}is-invalid{{end}}">
-                    <textarea name="note" id="note" class="form-control {{if .Form.FieldErrors.note}}is-invalid{{end}}"
+                <div class="form-floating {{if .Form.FormErrors.note}}is-invalid{{end}}">
+                    <textarea name="note" id="note" class="form-control {{if .Form.FormErrors.note}}is-invalid{{end}}"
                         placeholder="Additional info" style="min-height: 150px;">{{.Form.Note}}</textarea>
                     <label for="note">Additional info</label>
                 </div>
-                {{with .Form.FieldErrors.note}}
+                {{with .Form.FormErrors.note}}
                 <div class="invalid-feedback">{{.}}</div>
                 {{end}}
             </div>

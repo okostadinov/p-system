@@ -19,9 +19,10 @@ of its users granting access to the system's functionalities. The patients and m
 ### Setup
 
 * clone the repo and `cd` to it
-* `mkdir tls && cd tls`
-* generate a self-signed TLS cert (e.g. `go run <path-to-GO-stdlib>/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost`)
-* run `setup.sql` (via terminal: `sudo mysql -u root -p < setup.sql`)
-* to run the project `go run ./cmd/web`
+* you will need a TLS certificate:
+    * `mkdir tls` and put the `cert.pem` and `key.pem` files into the tls folder
+    * for local dev `cd tls` and `go run <path-to-GO-stdlib>/src/crypto/tls/generate_cert.go --rsa-bits=2048 --host=localhost`
+* run the db setup script (if via terminal: `sudo mysql -u root -p < ./scripts/setup.sql`)
+* to start up the project `go run ./cmd/web`
 * to build an executable `go build ./cmd/web`
 * to see flags usage, append `-h`/`--help` to run command
