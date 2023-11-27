@@ -83,7 +83,7 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	err = app.setFlash(w, r, "Patient successfully added!", "success")
+	err = app.setFlash(w, r, "Patient successfully added!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -189,7 +189,7 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Patient successfully updated!", "success")
+	err = app.setFlash(w, r, "Patient successfully updated!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -210,7 +210,7 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Patient successfully deleted!", "success")
+	err = app.setFlash(w, r, "Patient successfully deleted!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -229,7 +229,7 @@ func (app *application) patientSearchByUCN(w http.ResponseWriter, r *http.Reques
 	patient, err := app.patients.GetByUCN(form.UCN)
 	if err != nil {
 		if errors.Is(err, models.ErrNoRecord) {
-			err = app.setFlash(w, r, "No patients exists with this UCN.", "warning")
+			err = app.setFlash(w, r, "No patients exists with this UCN.", FlashTypeWarning)
 			if err != nil {
 				app.serverError(w, err)
 				return

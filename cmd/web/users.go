@@ -58,7 +58,7 @@ func (app *application) userSignupPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Registration successful! You may now log in.", "success")
+	err = app.setFlash(w, r, "Registration successful! You may now log in.", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -91,7 +91,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 	id, err := app.users.Authenticate(form.Email, form.Password)
 	if err != nil {
 		if errors.Is(err, models.ErrInvalidCredentials) {
-			err = app.setFlash(w, r, "Invalid email address or password.", "danger")
+			err = app.setFlash(w, r, "Invalid email address or password.", FlashTypeDanger)
 			if err != nil {
 				app.serverError(w, err)
 				return
@@ -116,7 +116,7 @@ func (app *application) userLoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Logged in successfully!", "success")
+	err = app.setFlash(w, r, "Logged in successfully!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -138,7 +138,7 @@ func (app *application) userLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Logged out successfully!", "success")
+	err = app.setFlash(w, r, "Logged out successfully!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return

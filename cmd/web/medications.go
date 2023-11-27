@@ -53,7 +53,7 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.setFlash(w, r, "Medication successfully added!", "success")
+	err = app.setFlash(w, r, "Medication successfully added!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return
@@ -71,7 +71,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(patients) > 0 {
-		err = app.setFlash(w, r, "Medication cannot be deleted due to registed patients.", "warning")
+		err = app.setFlash(w, r, "Medication cannot be deleted due to registed patients.", FlashTypeWarning)
 		if err != nil {
 			app.serverError(w, err)
 			return
@@ -86,7 +86,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err = app.setFlash(w, r, "Medication successfully deleted!", "success")
+	err = app.setFlash(w, r, "Medication successfully deleted!", FlashTypeSuccess)
 	if err != nil {
 		app.serverError(w, err)
 		return

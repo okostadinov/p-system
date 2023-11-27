@@ -10,11 +10,6 @@ import (
 	"github.com/gorilla/csrf"
 )
 
-type Flash struct {
-	Content string
-	Type    string
-}
-
 // outputs the error to the client, as well as logging it locally for debugging
 func (app *application) serverError(w http.ResponseWriter, err error) {
 	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
@@ -78,37 +73,6 @@ func (app *application) decodeForm(r *http.Request, form interface{}) error {
 	}
 
 	return nil
-}
-
-// adds a flash message to the current session
-func (app *application) setFlash(w http.ResponseWriter, r *http.Request, content string, flashType string) error {
-	session, err := app.store.Get(r, "session")
-	if err != nil {
-		return err
-	}
-
-	flash := Flash{Content: content, Type: flashType}
-	session.AddFlash(flash)
-	err = session.Save(r, w)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// pops the flash message from the current session and returns it
-func (app *application) popFlash(w http.ResponseWriter, r *http.Request) Flash {
-	flash := &Flash{}
-
-	session, _ := app.store.Get(r, "session")
-
-	if flashes := session.Flashes(); len(flashes) > 0 {
-		flash = flashes[0].(*Flash)
-		session.Save(r, w)
-	}
-
-	return *flash
 }
 
 // checks whether a user is logged based on the current session
