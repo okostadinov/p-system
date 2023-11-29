@@ -77,7 +77,13 @@ func (app *application) patientCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	id, err := app.patients.Insert(form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note)
+	userId := app.getUserIdFromContext(w, r)
+	if userId == 0 {
+		app.serverError(w, err)
+		return
+	}
+
+	id, err := app.patients.Insert(form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, userId)
 	if err != nil {
 		app.serverError(w, err)
 		return

@@ -15,6 +15,7 @@ type templateData struct {
 	Form            any
 	Flash           Flash
 	IsAuthenticated bool
+	UserId          int
 	CSRFField       template.HTML
 }
 

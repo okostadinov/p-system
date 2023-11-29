@@ -11,7 +11,7 @@
                 <div class="form-floating {{if .Form.FormErrors.ucn}}is-invalid{{end}}">
                     <input name="ucn" id="ucn" type="text"
                         class="form-control {{if .Form.FormErrors.ucn}}is-invalid{{end}}" placeholder="UCN"
-                        value="{{.Patient.UCN}}">
+                        value="{{.Patient.UCN}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="ucn">UCN</label>
                 </div>
                 {{with .Form.FormErrors.ucn}}
@@ -24,7 +24,7 @@
                 <div class="form-floating {{if .Form.FormErrors.first_name}}is-invalid{{end}}">
                     <input name="first_name" id="first_name" type="text"
                         class="form-control {{if .Form.FormErrors.first_name}}is-invalid{{end}}"
-                        placeholder="First name" value="{{.Patient.FirstName}}">
+                        placeholder="First name" value="{{.Patient.FirstName}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="first_name">First name</label>
                 </div>
                 {{with .Form.FormErrors.first_name}}
@@ -37,7 +37,7 @@
                 <div class="form-floating {{if .Form.FormErrors.last_name}}is-invalid{{end}}">
                     <input name="last_name" id="last_name" type="text"
                         class="form-control {{if .Form.FormErrors.last_name}}is-invalid{{end}}" placeholder="Last name"
-                        value="{{.Patient.LastName}}">
+                        value="{{.Patient.LastName}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="last_name">Last name</label>
                 </div>
                 {{with .Form.FormErrors.last_name}}
@@ -52,7 +52,7 @@
                 <div class="form-floating {{if .Form.FormErrors.phone_number}}is-invalid{{end}}">
                     <input name="phone_number" id="phone_number" type="text"
                         class="form-control {{if .Form.FormErrors.phone_number}}is-invalid{{end}}"
-                        placeholder="Phone number" value="{{.Patient.PhoneNumber}}">
+                        placeholder="Phone number" value="{{.Patient.PhoneNumber}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="phone_number">Phone number</label>
                 </div>
                 {{with .Form.FormErrors.phone_number}}
@@ -65,7 +65,7 @@
                 <div class="form-floating {{if .Form.FormErrors.height}}is-invalid{{end}}">
                     <input name="height" id="height" type="number"
                         class="form-control {{if .Form.FormErrors.height}}is-invalid{{end}}" placeholder="Height"
-                        value="{{.Patient.Height}}">
+                        value="{{.Patient.Height}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="height">Height</label>
                 </div>
                 {{with .Form.FormErrors.height}}
@@ -78,7 +78,7 @@
                 <div class="form-floating {{if .Form.FormErrors.weight}}is-invalid{{end}}">
                     <input name="weight" id="weight" type="number"
                         class="form-control {{if .Form.FormErrors.weight}}is-invalid{{end}}" placeholder="Weight"
-                        value="{{.Patient.Weight}}">
+                        value="{{.Patient.Weight}}" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     <label for="weight">Weight</label>
                 </div>
                 {{with .Form.FormErrors.weight}}
@@ -88,7 +88,7 @@
         </div>
         <div class="col">
             <div class="form-floating">
-                <select name="medication" id="medication" class="form-select">
+                <select name="medication" id="medication" class="form-select" {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                     {{$p := .Patient}}
                     {{range .Medications}}
                     <option value="{{.Name}}" {{if eq $p.Medication .Name}}selected{{end}}>{{.Name}}</option>
@@ -103,7 +103,7 @@
             <div class="input-group has-validation">
                 <div class="form-floating {{if .Form.FormErrors.note}}is-invalid{{end}}">
                     <textarea name="note" id="note" class="form-control {{if .Form.FormErrors.note}}is-invalid{{end}}"
-                        placeholder="Additional info" style="min-height: 150px;">{{.Patient.Note}}</textarea>
+                        placeholder="Additional info" style="min-height: 150px;" {{if ne .UserId .Patient.UserId}}disabled{{end}}>{{.Patient.Note}}</textarea>
                     <label for="note">Additional info</label>
                 </div>
                 {{with .Form.FormErrors.note}}
@@ -119,12 +119,12 @@
                     <legend class="form-label h6">Approved</legend>
                     <div class="form-check-inline">
                         <input name="approved" id="approved1" type="radio" class="btn-check" value="true" {{if
-                            .Patient.Approved}}checked{{end}}>
+                            .Patient.Approved}}checked{{end}} {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                         <label for="approved1" class="btn btn-outline-primary">Yes</label>
                     </div>
                     <div class="form-check-inline">
                         <input name="approved" id="approved2" type="radio" class="btn-check" value="false" {{if not
-                            .Patient.Approved}}checked{{end}}>
+                            .Patient.Approved}}checked{{end}} {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                         <label for="approved2" class="btn btn-outline-secondary">No</label>
                     </div>
                 </fieldset>
@@ -136,23 +136,26 @@
                     <legend class="form-label h6">First continuation</legend>
                     <div class="form-check-inline">
                         <input name="first_continuation" id="firstCont1" type="radio" class="btn-check" value="true"
-                            {{if .Patient.FirstContinuation}}checked{{end}}>
+                            {{if .Patient.FirstContinuation}}checked{{end}} {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                         <label for="firstCont1" class="btn btn-outline-primary">Yes</label>
                     </div>
                     <div class="form-check-inline">
                         <input name="first_continuation" id="firstCont2" type="radio" class="btn-check" value="false"
-                            {{if not .Patient.FirstContinuation}}checked{{end}}>
+                            {{if not .Patient.FirstContinuation}}checked{{end}} {{if ne .UserId .Patient.UserId}}disabled{{end}}>
                         <label for="firstCont2" class="btn btn-outline-secondary">No</label>
                     </div>
                 </fieldset>
             </div>
         </div>
     </div>
+    {{if eq .UserId .Patient.UserId}}
     <div class="row">
         <div class="col">
+            <input type="hidden" name="user_id" value="{{.Patient.UserId}}">
             <input type="submit" class="btn btn-success btn-lg" value="Save">
         </div>
     </div>
+    {{end}}
 </form>
 {{end}}
 {{end}}

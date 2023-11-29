@@ -23,15 +23,19 @@
     </div>
 </form>
 {{if .Medications}}
+{{$userId := .UserId}}
 <ul class="list-group list-group-flush" style="max-width: 500px;">
     {{range .Medications}}
     <a class="list-group-item list-group-item-action list-group-item-light d-flex align-items-center justify-content-between"
         href="/patients/medication/{{.Name}}"><span>{{.Name}}</span>
+        {{if eq .UserId $userId}}
         <form action="/medications/delete" method="POST">
             {{$csrf}}
             <input type="hidden" name="name" value="{{.Name}}">
+            <input type="hidden" name="user_id" value="{{.UserId}}">
             <input type="submit" class="btn btn-danger" value="Delete">
         </form>
+        {{end}}
     </a>
     {{end}}
 </ul>

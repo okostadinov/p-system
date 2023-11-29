@@ -47,7 +47,13 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.medications.Insert(form.Name)
+	userId := app.getUserIdFromContext(w, r)
+	if userId == 0 {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.medications.Insert(form.Name, userId)
 	if err != nil {
 		app.serverError(w, err)
 		return
