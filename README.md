@@ -4,7 +4,9 @@
 
 P-System is a webapp developed with GO connecting to a MySQL database used to store patient and medication data.
 It implements a web fronted in order to access the endpoints. Basic authentication is used for authorization
-of its users granting access to the system's functionalities. The patients and medications tables are shared.
+of its users granting access to the system's functionalities. GET requests are available to all users upon
+being authenticated, while POST requests are limited only to own patients and medications. For example Mark
+can see Emily's patients, but he cannot modify them.
 
 ### Features
 
@@ -15,6 +17,8 @@ of its users granting access to the system's functionalities. The patients and m
 * form validations
 * sessions (incl flash messages)
 * authentication & authorization
+    * all authenticated users gain access to viewing all patients and medications
+    * users may update and delete only own created patients and medications
 
 ### Setup
 
