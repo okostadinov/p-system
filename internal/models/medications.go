@@ -3,16 +3,17 @@ package models
 import "database/sql"
 
 type Medication struct {
-	Name string
+	Name   string
+	UserId int
 }
 
 type MedicationModel struct {
 	DB *sql.DB
 }
 
-func (m *MedicationModel) Insert(name string) error {
-	stmt := "INSERT INTO medications (name) VALUES (?)"
-	_, err := m.DB.Exec(stmt, name)
+func (m *MedicationModel) Insert(name string, userId int) error {
+	stmt := "INSERT INTO medications (name, user_id) VALUES (?, ?)"
+	_, err := m.DB.Exec(stmt, name, userId)
 	if err != nil {
 		return err
 	}
@@ -33,7 +34,7 @@ func (m *MedicationModel) GetAll() ([]*Medication, error) {
 	for rows.Next() {
 		var med Medication
 
-		err = rows.Scan(&med.Name)
+		err = rows.Scan(&med.Name, &med.UserId)
 		if err != nil {
 			return nil, err
 		}

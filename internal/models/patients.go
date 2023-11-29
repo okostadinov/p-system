@@ -17,16 +17,17 @@ type Patient struct {
 	Note              string
 	Approved          bool
 	FirstContinuation bool
+	UserId            int
 }
 
 type PatientModel struct {
 	DB *sql.DB
 }
 
-func (m *PatientModel) Insert(ucn string, firstName string, lastName string, phone string, height int, weight int, medication string, note string) (int, error) {
-	stmt := "INSERT INTO patients (ucn, first_name, last_name, phone_number, height, weight, medication, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+func (m *PatientModel) Insert(ucn string, firstName string, lastName string, phone string, height int, weight int, medication string, note string, userId int) (int, error) {
+	stmt := "INSERT INTO patients (ucn, first_name, last_name, phone_number, height, weight, medication, note, user_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
 
-	result, err := m.DB.Exec(stmt, ucn, firstName, lastName, phone, height, weight, medication, note)
+	result, err := m.DB.Exec(stmt, ucn, firstName, lastName, phone, height, weight, medication, note, userId)
 	if err != nil {
 		return 0, err
 	}
@@ -43,7 +44,7 @@ func (m *PatientModel) Get(id int) (*Patient, error) {
 	var p Patient
 
 	stmt := "SELECT * FROM patients WHERE id = ?"
-	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
+	err := m.DB.QueryRow(stmt, id).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -59,7 +60,7 @@ func (m *PatientModel) GetByUCN(ucn string) (*Patient, error) {
 	var p Patient
 
 	stmt := "SELECT * FROM patients WHERE ucn = ?"
-	err := m.DB.QueryRow(stmt, ucn).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
+	err := m.DB.QueryRow(stmt, ucn).Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNoRecord
@@ -84,7 +85,7 @@ func (m *PatientModel) Latest() ([]*Patient, error) {
 	for rows.Next() {
 		var p Patient
 
-		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
 		if err != nil {
 			return nil, err
 		}
@@ -111,7 +112,7 @@ func (m *PatientModel) GetAll() ([]*Patient, error) {
 	for rows.Next() {
 		var p Patient
 
-		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
 		if err != nil {
 			return nil, err
 		}
@@ -138,7 +139,7 @@ func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error)
 	for rows.Next() {
 		var p Patient
 
-		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation)
+		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
 		if err != nil {
 			return nil, err
 		}

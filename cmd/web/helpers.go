@@ -56,6 +56,7 @@ func (app *application) newTemplateData(w http.ResponseWriter, r *http.Request) 
 		CurrentYear:     time.Now().Year(),
 		Flash:           app.popFlash(w, r),
 		IsAuthenticated: app.isAuthenticated(w, r),
+		UserId:          app.getUserIdFromContext(w, r),
 		CSRFField:       csrf.TemplateField(r),
 	}
 }
@@ -75,22 +76,30 @@ func (app *application) decodeForm(r *http.Request, form interface{}) error {
 	return nil
 }
 
-// checks whether a user is logged in
+// checks whether a user is logged in based on the request context
 func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
 	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
 	if !ok {
 		return false
 	}
-
 	return isAuthenticated
 }
 
 // retrieves the current authenticated user's ID from the current session
-func (app *application) getUserID(w http.ResponseWriter, r *http.Request) int {
+func (app *application) getUserId(w http.ResponseWriter, r *http.Request) int {
 	session, _ := app.store.Get(r, "session")
 	userID, ok := session.Values["userID"].(int)
 	if !ok {
 		return 0
 	}
 	return userID
+}
+
+// fetches the current authenticated user's ID from the request context
+func (app *application) getUserIdFromContext(w http.ResponseWriter, r *http.Request) int {
+	userId, ok := r.Context().Value(userIdContextKey).(int)
+	if !ok {
+		return 0
+	}
+	return userId
 }

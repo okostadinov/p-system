@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/csrf"
 )
@@ -56,7 +57,7 @@ func (app *application) requireAuthentication(next http.Handler) http.Handler {
 
 func (app *application) authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		userId := app.getUserID(w, r)
+		userId := app.getUserId(w, r)
 		if userId == 0 {
 			next.ServeHTTP(w, r)
 			return
@@ -70,7 +71,33 @@ func (app *application) authenticate(next http.Handler) http.Handler {
 
 		if exists {
 			ctx := context.WithValue(r.Context(), isAuthenticatedContextKey, true)
+			ctx = context.WithValue(ctx, userIdContextKey, userId)
 			r = r.WithContext(ctx)
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) verifyAuthorization(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		userId := app.getUserIdFromContext(w, r)
+		err := r.ParseForm()
+		if err != nil {
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
+
+		targetUserId, err := strconv.Atoi(r.PostForm.Get("user_id"))
+		if err != nil {
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
+
+		if targetUserId != userId {
+			app.setFlash(w, r, "Unauthorized action!", FlashTypeDanger)
+			http.Redirect(w, r, r.Referer(), http.StatusSeeOther)
+			return
 		}
 
 		next.ServeHTTP(w, r)

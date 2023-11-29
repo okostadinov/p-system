@@ -20,6 +20,7 @@
         </thead>
         <tbody>
             {{$csrf := .CSRFField}}
+            {{$userId := .UserId}}
             {{range .Patients}}
             <tr>
                 <td scope="col">{{.UCN}}</td>
@@ -32,12 +33,15 @@
                 </td>
                 <td scope="col"><input type="checkbox" class="form-check-input" disabled {{if
                         .FirstContinuation}}checked{{end}}></td>
-                <td scope="col">
+                        <td scope="col">
+                    {{if eq .UserId $userId}}
                     <form action="/patients/delete" method="POST">
                         {{$csrf}}
                         <input type="hidden" name="id" value="{{.ID}}">
+                        <input type="hidden" name="user_id" value="{{.UserId}}">
                         <input type="submit" class="btn btn-danger" value="Delete">
                     </form>
+                    {{end}}
                 </td>
             </tr>
             {{end}}
