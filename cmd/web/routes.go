@@ -13,7 +13,7 @@ func (app *application) routes(csrfKey string) http.Handler {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
-	mux.Use(app.recoverPanic, app.logRequest, secureHeaders, csrfProtect(csrfKey))
+	mux.Use(app.recoverPanic, app.logRequest, secureHeaders, app.authenticate, csrfProtect(csrfKey))
 
 	mux.HandleFunc("/", app.home).Methods("GET")
 

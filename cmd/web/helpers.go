@@ -75,9 +75,22 @@ func (app *application) decodeForm(r *http.Request, form interface{}) error {
 	return nil
 }
 
-// checks whether a user is logged based on the current session
+// checks whether a user is logged in
 func (app *application) isAuthenticated(w http.ResponseWriter, r *http.Request) bool {
+	isAuthenticated, ok := r.Context().Value(isAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+
+	return isAuthenticated
+}
+
+// retrieves the current authenticated user's ID from the current session
+func (app *application) getUserID(w http.ResponseWriter, r *http.Request) int {
 	session, _ := app.store.Get(r, "session")
-	_, ok := session.Values["userID"]
-	return ok
+	userID, ok := session.Values["userID"].(int)
+	if !ok {
+		return 0
+	}
+	return userID
 }
