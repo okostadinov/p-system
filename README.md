@@ -12,7 +12,8 @@ can see Emily's patients, but he cannot modify them.
 
 * CRUD operations for patients and medications
 * filtering of patients based on medication
-* looking up patients by UCN (national ID)
+* filtering only own created patients
+* looking up patients by UCN (ID)
 * dynamic html templating
 * form validations
 * sessions (incl flash messages)

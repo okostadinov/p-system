@@ -1,8 +1,10 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 
+	"p-system.okostadinov.net/internal/models"
 	"p-system.okostadinov.net/internal/validator"
 )
 
@@ -70,25 +72,25 @@ func (app *application) medicationAdd(w http.ResponseWriter, r *http.Request) {
 func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request) {
 	name := r.FormValue("name")
 
-	patients, err := app.patients.GetAllByMedication(name)
+	err := app.medications.Delete(name, app.getUserIdFromContext(w, r))
 	if err != nil {
-		app.serverError(w, err)
-		return
-	}
-
-	if len(patients) > 0 {
-		err = app.setFlash(w, r, "Medication cannot be deleted due to registed patients.", FlashTypeWarning)
-		if err != nil {
+		if errors.Is(err, models.ErrExistingDependency) {
+			err = app.setFlash(w, r, "Medication cannot be deleted due to registed patients.", FlashTypeWarning)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			http.Redirect(w, r, "/medications/", http.StatusSeeOther)
+		} else if errors.Is(err, models.ErrUnauthorizedAction) {
+			err = app.setFlash(w, r, "Unauthorized action - cannot delete medications!", FlashTypeDanger)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			http.Redirect(w, r, "/medications/", http.StatusSeeOther)
+		} else {
 			app.serverError(w, err)
-			return
 		}
-		http.Redirect(w, r, "/medications/", http.StatusSeeOther)
-		return
-	}
-
-	err = app.medications.Delete(name)
-	if err != nil {
-		app.serverError(w, err)
 		return
 	}
 
