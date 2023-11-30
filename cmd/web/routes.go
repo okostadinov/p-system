@@ -20,6 +20,7 @@ func (app *application) routes(csrfKey string) http.Handler {
 	patientsRouter := mux.PathPrefix("/patients").Subrouter()
 	patientsRouter.Use(app.requireAuthentication)
 	patientsRouter.HandleFunc("/", app.patientList).Methods("GET")
+	patientsRouter.HandleFunc("/user", app.patientListOwn).Methods("GET")
 	patientsRouter.HandleFunc("/medication/{name}", app.patientListFiltered).Methods("GET")
 	patientsRouter.HandleFunc("/create", app.patientCreate).Methods("GET")
 	patientsRouter.HandleFunc("/create", app.patientCreatePost).Methods("POST")

@@ -153,6 +153,33 @@ func (m *PatientModel) GetAllByMedication(medication string) ([]*Patient, error)
 	return patients, nil
 }
 
+func (m *PatientModel) GetAllByUserId(userId int) ([]*Patient, error) {
+	var patients []*Patient
+
+	stmt := "SELECT * FROM patients WHERE user_id = ?"
+	rows, err := m.DB.Query(stmt, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var p Patient
+
+		err := rows.Scan(&p.ID, &p.UCN, &p.FirstName, &p.LastName, &p.PhoneNumber, &p.Height, &p.Weight, &p.Medication, &p.Note, &p.Approved, &p.FirstContinuation, &p.UserId)
+		if err != nil {
+			return nil, err
+		}
+		patients = append(patients, &p)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return patients, nil
+}
+
 func (m *PatientModel) Update(id int, ucn string, firstName string, lastName string, phone string, height int, weight int, medication string, note string, approved bool, firstCont bool, userId int) error {
 	stmt := "UPDATE patients SET ucn = ?, first_name = ?, last_name = ?, phone_number = ?, height = ?, weight = ?, medication = ?, note = ?, approved = ?, first_continuation = ? WHERE id = ? && user_id = ?"
 
