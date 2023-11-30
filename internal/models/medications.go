@@ -1,6 +1,8 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 type Medication struct {
 	Name   string
@@ -48,9 +50,34 @@ func (m *MedicationModel) GetAll() ([]*Medication, error) {
 	return medications, nil
 }
 
-func (m *MedicationModel) Delete(name string) error {
-	stmt := "DELETE FROM medications WHERE name = ?"
+func (m *MedicationModel) Delete(name string, userId int) error {
+	var exists bool
+	stmt := "SELECT EXISTS(SELECT true FROM patients WHERE medication = ?)"
 
-	_, err := m.DB.Exec(stmt, name)
-	return err
+	err := m.DB.QueryRow(stmt, name).Scan(&exists)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return ErrExistingDependency
+	}
+
+	stmt = "DELETE FROM medications WHERE name = ? && user_id = ?"
+
+	res, err := m.DB.Exec(stmt, name, userId)
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrUnauthorizedAction
+	}
+
+	return nil
 }

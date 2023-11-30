@@ -38,7 +38,6 @@
                     <form action="/patients/delete" method="POST">
                         {{$csrf}}
                         <input type="hidden" name="id" value="{{.ID}}">
-                        <input type="hidden" name="user_id" value="{{.UserId}}">
                         <input type="submit" class="btn btn-danger" value="Delete">
                     </form>
                     {{end}}

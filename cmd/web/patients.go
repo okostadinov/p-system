@@ -189,9 +189,18 @@ func (app *application) patientUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.patients.Update(id, form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, form.Approved, form.FirstContinuation)
+	err = app.patients.Update(id, form.UCN, form.FirstName, form.LastName, form.PhoneNumber, form.Height, form.Weight, form.Medication, form.Note, form.Approved, form.FirstContinuation, app.getUserIdFromContext(w, r))
 	if err != nil {
-		app.serverError(w, err)
+		if errors.Is(err, models.ErrUnauthorizedAction) {
+			err = app.setFlash(w, r, "Unauthorized action - cannot modify patient!", FlashTypeDanger)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			http.Redirect(w, r, fmt.Sprintf("/patients/%d", id), http.StatusSeeOther)
+		} else {
+			app.serverError(w, err)
+		}
 		return
 	}
 
@@ -210,9 +219,18 @@ func (app *application) patientDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.patients.Delete(id)
+	err = app.patients.Delete(id, app.getUserIdFromContext(w, r))
 	if err != nil {
-		app.serverError(w, err)
+		if errors.Is(err, models.ErrUnauthorizedAction) {
+			err = app.setFlash(w, r, "Unauthorized action - cannot delete patient!", FlashTypeDanger)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			http.Redirect(w, r, "/patients/", http.StatusSeeOther)
+		} else {
+			app.serverError(w, err)
+		}
 		return
 	}
 
