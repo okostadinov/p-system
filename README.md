@@ -2,13 +2,9 @@
 
 ### Description
 
-***Work in progress***
-
-P-System is a webapp used as a database for patient entities and data associated with them.
+P-System is a webapp used to manage patient and medications data using a local SQLite database.
 
 ### Features
-
-***Work in progress***
 
 * CRUD operations for patients and medications
 * filter patients by medication
@@ -19,16 +15,8 @@ P-System is a webapp used as a database for patient entities and data associated
 
 ### Setup
 
-***Work in progress***
-
-* a mysql db needs to be set beforehand
+* requires `gcc` and the env variable `CGO_ENABLED` to be set
 * clone the repo
 * `cd` into the project folder
 * to run the project `go run ./cmd/web`
 * to build an executable `go build ./cmd/web`
-
-### TODO
-
-* authentication
-* tests
-* deployment

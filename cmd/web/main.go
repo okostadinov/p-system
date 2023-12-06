@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -11,8 +10,8 @@ import (
 	"reflect"
 	"time"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/srinathgs/mysqlstore"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/michaeljs1990/sqlitestore"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
@@ -28,33 +27,38 @@ type application struct {
 	templateCache map[string]*template.Template
 	decoder       *schema.Decoder
 	validator     *validator.Validate
-	store         *mysqlstore.MySQLStore
+	store         *sqlitestore.SqliteStore
 }
 
 var validate *validator.Validate
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
-	dsn := flag.String("dsn", "admin:admin@/p_system?parseTime=true&loc=Local", "MySQL data source name")
-	storeKey := flag.String("storekey", "secretkey", "MySQL session store key")
+	dbpath := flag.String("dbpath", "./p_system.db", "SQLite database file path")
+	storeKey := flag.String("storekey", "secretkey", "SQLite session store key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	db, err := openDB(*dsn)
+	db, err := openDB(*dbpath)
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
 	defer db.Close()
 
+	err = models.SetupDB(db)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
+
 	templateCache, err := newTemplateCache()
 	if err != nil {
 		errorLog.Fatal(err)
 	}
 
-	store, err := mysqlstore.NewMySQLStoreFromConnection(db, "sessions", "/", 3600, []byte(*storeKey))
+	store, err := sqlitestore.NewSqliteStoreFromConnection(db, "sessions", "/", 3600, []byte(*storeKey))
 	if err != nil {
 		errorLog.Fatal(err)
 	}
@@ -79,25 +83,20 @@ func main() {
 		store:         store,
 	}
 
-	tlsConfig := &tls.Config{
-		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	}
-
 	srv := &http.Server{
 		Addr:         *addr,
 		ErrorLog:     errorLog,
 		Handler:      app.routes(),
-		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
 
-	errorLog.Fatal(srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem"))
+	errorLog.Fatal(srv.ListenAndServe())
 }
 
-func openDB(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+func openDB(dbpath string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", dbpath)
 	if err != nil {
 		return nil, err
 	}

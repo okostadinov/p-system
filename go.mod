@@ -2,8 +2,6 @@ module p-system.okostadinov.net
 
 go 1.21.2
 
-require github.com/go-sql-driver/mysql v1.7.1
-
 require github.com/gorilla/mux v1.8.0
 
 require (
@@ -11,7 +9,8 @@ require (
 	github.com/gorilla/schema v1.2.1
 	github.com/gorilla/sessions v1.2.2
 	github.com/justinas/alice v1.2.0
-	github.com/srinathgs/mysqlstore v0.0.0-20200417050510-9cbb9420fc4c
+	github.com/mattn/go-sqlite3 v1.14.18
+	github.com/michaeljs1990/sqlitestore v0.0.0-20210507162135-8585425bc864
 )
 
 require (
