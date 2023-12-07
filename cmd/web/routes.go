@@ -5,14 +5,16 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"p-system.okostadinov.net/ui"
 )
 
 // registers the routes to a mux assigned to the server
 func (app *application) routes() http.Handler {
 	mux := mux.NewRouter()
 
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-	mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
+	fileServer := http.FileServer(http.FS(ui.Files))
+	mux.Handle("/static/*filepath", fileServer).Methods("GET")
+	// mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
 	mux.HandleFunc("/", app.home).Methods("GET")
 
