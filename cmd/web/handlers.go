@@ -329,3 +329,7 @@ func (app *application) medicationDelete(w http.ResponseWriter, r *http.Request)
 	app.setFlash(w, r, "Медикаментът бе изтрит успешно")
 	http.Redirect(w, r, "/medications/", http.StatusSeeOther)
 }
+
+func (app *application) shutdown(w http.ResponseWriter, r *http.Request) {
+	app.infoLog.Fatal("shutting down!")
+}

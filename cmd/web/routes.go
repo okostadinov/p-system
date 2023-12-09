@@ -13,8 +13,7 @@ func (app *application) routes() http.Handler {
 	mux := mux.NewRouter()
 
 	fileServer := http.FileServer(http.FS(ui.Files))
-	mux.Handle("/static/*filepath", fileServer).Methods("GET")
-	// mux.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
+	mux.PathPrefix("/static/").Handler(fileServer).Methods("GET")
 
 	mux.HandleFunc("/", app.home).Methods("GET")
 
@@ -32,6 +31,8 @@ func (app *application) routes() http.Handler {
 	medicationsRouter.HandleFunc("/", app.medicationList).Methods("GET")
 	medicationsRouter.HandleFunc("/", app.medicationAdd).Methods("POST")
 	medicationsRouter.HandleFunc("/delete", app.medicationDelete).Methods("POST")
+
+	mux.HandleFunc("/shutdown", app.shutdown)
 
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 

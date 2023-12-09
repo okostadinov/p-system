@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/michaeljs1990/sqlitestore"
+	"github.com/pkg/browser"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
@@ -92,6 +94,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	browser.OpenURL(fmt.Sprintf(`http://localhost%s`, *addr))
 	errorLog.Fatal(srv.ListenAndServe())
 }
 
