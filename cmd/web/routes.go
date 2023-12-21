@@ -32,8 +32,6 @@ func (app *application) routes() http.Handler {
 	medicationsRouter.HandleFunc("/", app.medicationAdd).Methods("POST")
 	medicationsRouter.HandleFunc("/delete", app.medicationDelete).Methods("POST")
 
-	mux.HandleFunc("/shutdown", app.shutdown)
-
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
 	return standard.Then(mux)
