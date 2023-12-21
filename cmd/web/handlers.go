@@ -22,8 +22,8 @@ type templateData struct {
 
 type patientCreateForm struct {
 	UCN         string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName   string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName    string `schema:"last_name" validate:"required,alphaunicode"`
+	FirstName   string `schema:"first_name" validate:"required"`
+	LastName    string `schema:"last_name" validate:"required"`
 	PhoneNumber string `schema:"phone_number" validate:"required,e164"`
 	Height      int    `schema:"height" validate:"required,numeric"`
 	Weight      int    `schema:"weight" validate:"required,numeric"`
@@ -34,8 +34,8 @@ type patientCreateForm struct {
 
 type patientEditForm struct {
 	UCN               string `schema:"ucn" validate:"required,numeric,len=10"`
-	FirstName         string `schema:"first_name" validate:"required,alphaunicode"`
-	LastName          string `schema:"last_name" validate:"required,alphaunicode"`
+	FirstName         string `schema:"first_name" validate:"required"`
+	LastName          string `schema:"last_name" validate:"required"`
 	PhoneNumber       string `schema:"phone_number" validate:"required,e164"`
 	Height            int    `schema:"height" validate:"required,numeric"`
 	Weight            int    `schema:"weight" validate:"required,numeric"`
